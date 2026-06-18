@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-labelledby="title desc">
+  <title id="title">名古屋三越 POP・Web制作のサムネイル</title>
+  <desc id="desc">館内POP、A4フライヤー、Web/LP更新をまとめた販促制作の図</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#081526"/>
+      <stop offset="0.5" stop-color="#10283d"/>
+      <stop offset="1" stop-color="#26172c"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#dfeaf4"/>
+    </linearGradient>
+    <linearGradient id="web" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#123a56"/>
+      <stop offset="1" stop-color="#07111f"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="520" fill="url(#bg)"/>
+  <circle cx="760" cy="100" r="170" fill="#14c78d" fill-opacity="0.1"/>
+  <circle cx="120" cy="430" r="190" fill="#f6b84b" fill-opacity="0.1"/>
+
+  <g transform="translate(86 78)">
+    <rect x="0" y="0" width="280" height="364" rx="18" fill="url(#paper)" filter="drop-shadow(0 20px 26px rgba(0,0,0,.35))"/>
+    <rect x="28" y="30" width="224" height="76" rx="8" fill="#b81733"/>
+    <text x="140" y="78" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="30" font-weight="900" fill="#fff">POP</text>
+    <rect x="28" y="134" width="224" height="16" rx="8" fill="#13243a" fill-opacity="0.82"/>
+    <rect x="28" y="166" width="168" height="14" rx="7" fill="#13243a" fill-opacity="0.45"/>
+    <rect x="28" y="208" width="96" height="96" rx="12" fill="#f6b84b"/>
+    <rect x="142" y="208" width="110" height="28" rx="8" fill="#14c78d"/>
+    <rect x="142" y="252" width="86" height="14" rx="7" fill="#13243a" fill-opacity="0.35"/>
+    <rect x="142" y="282" width="110" height="14" rx="7" fill="#13243a" fill-opacity="0.25"/>
+    <text x="28" y="342" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="800" fill="#13243a">A4 Flyer / Thumbnail</text>
+  </g>
+
+  <g transform="translate(358 126)">
+    <rect width="456" height="276" rx="24" fill="url(#web)" stroke="#14c78d" stroke-opacity="0.55" filter="drop-shadow(0 24px 34px rgba(0,0,0,.4))"/>
+    <rect x="0" y="0" width="456" height="48" rx="24" fill="#0f2235"/>
+    <circle cx="34" cy="24" r="7" fill="#ff6b8a"/>
+    <circle cx="58" cy="24" r="7" fill="#f6b84b"/>
+    <circle cx="82" cy="24" r="7" fill="#14c78d"/>
+    <rect x="34" y="78" width="178" height="26" rx="8" fill="#f7fbff"/>
+    <rect x="34" y="120" width="270" height="16" rx="8" fill="#a7b7c7" fill-opacity="0.7"/>
+    <rect x="34" y="152" width="216" height="16" rx="8" fill="#a7b7c7" fill-opacity="0.42"/>
+    <rect x="312" y="78" width="104" height="104" rx="18" fill="#14c78d" fill-opacity="0.2" stroke="#14c78d"/>
+    <path d="M338 148h52M364 122v52" stroke="#14c78d" stroke-width="8" stroke-linecap="round"/>
+    <rect x="34" y="214" width="120" height="34" rx="17" fill="#14c78d"/>
+    <text x="94" y="237" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="900" fill="#04111d">WEB / LP</text>
+  </g>
+
+  <g font-family="Inter, system-ui, sans-serif">
+    <text x="450" y="44" text-anchor="middle" font-size="23" font-weight="900" fill="#f7fbff">Nagoya Mitsukoshi</text>
+    <text x="450" y="480" text-anchor="middle" font-size="18" font-weight="800" fill="#a7b7c7">POP / DTP / Web Update</text>
+  </g>
+</svg>
