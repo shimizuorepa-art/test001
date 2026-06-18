@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>現場感覚とデジタルをつなぐポートフォリオ | Y.Shimizu</title>
+    <title>Digital Portfolio | Yosuke Shimizu</title>
     <meta
       name="description"
       content="現場経験、販促制作、Web/WordPress運用、AI/GAS/MCPによるDX推進を横断して示すポートフォリオ。A4横の提案資料としても印刷できます。"
@@ -219,6 +219,27 @@
         font-weight: 900;
         letter-spacing: 0;
       }
+      .cover-title {
+        display: grid;
+        gap: 18px;
+        max-width: 760px;
+        text-transform: uppercase;
+      }
+      .title-main,
+      .title-sub {
+        display: block;
+        letter-spacing: 0;
+      }
+      .title-main {
+        font-size: 88px;
+        line-height: 0.95;
+      }
+      .title-sub {
+        color: var(--muted);
+        font-size: 24px;
+        font-weight: 800;
+        line-height: 1.2;
+      }
       .hero .lead { margin-top: 24px; }
       .hero-actions {
         display: flex;
@@ -387,14 +408,16 @@
         place-items: center;
       }
       .pie {
+        --skill-progress: 1;
         width: min(420px, 72vw);
         aspect-ratio: 1;
         border-radius: 50%;
         background: conic-gradient(
-          var(--accent) 0 35%,
-          var(--accent2) 35% 65%,
-          var(--violet) 65% 85%,
-          var(--amber) 85% 100%
+          var(--accent) 0 calc(126deg * var(--skill-progress)),
+          var(--accent2) calc(126deg * var(--skill-progress)) calc(234deg * var(--skill-progress)),
+          var(--violet) calc(234deg * var(--skill-progress)) calc(306deg * var(--skill-progress)),
+          var(--amber) calc(306deg * var(--skill-progress)) calc(360deg * var(--skill-progress)),
+          rgba(255, 255, 255, 0.06) 0 360deg
         );
         box-shadow: 0 28px 70px rgba(0, 0, 0, 0.36);
       }
@@ -497,6 +520,113 @@
         stroke-linejoin: round;
       }
 
+      @property --skill-progress {
+        syntax: "<number>";
+        inherits: false;
+        initial-value: 1;
+      }
+      .motion-ready .slide {
+        opacity: 0;
+        transform: translateY(26px);
+        transition: opacity 0.72s ease, transform 0.72s ease;
+      }
+      .motion-ready .slide.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .motion-ready .slide-head,
+      .motion-ready .cover-title .title-main,
+      .motion-ready .cover-title .title-sub,
+      .motion-ready .lead,
+      .motion-ready .hero-actions,
+      .motion-ready .value-card,
+      .motion-ready .work-card,
+      .motion-ready .legend-row,
+      .motion-ready .timeline-step,
+      .motion-ready .link-panel,
+      .motion-ready .footer-line {
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 0.62s ease, transform 0.62s ease;
+      }
+      .motion-ready .slide.is-visible .slide-head,
+      .motion-ready .slide.is-visible .cover-title .title-main,
+      .motion-ready .slide.is-visible .cover-title .title-sub,
+      .motion-ready .slide.is-visible .lead,
+      .motion-ready .slide.is-visible .hero-actions,
+      .motion-ready .slide.is-visible .value-card,
+      .motion-ready .slide.is-visible .work-card,
+      .motion-ready .slide.is-visible .legend-row,
+      .motion-ready .slide.is-visible .timeline-step,
+      .motion-ready .slide.is-visible .link-panel,
+      .motion-ready .slide.is-visible .footer-line {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .motion-ready .slide.is-visible .slide-head { transition-delay: 0.06s; }
+      .motion-ready .slide.is-visible .cover-title .title-main { transition-delay: 0.16s; }
+      .motion-ready .slide.is-visible .cover-title .title-sub { transition-delay: 0.32s; }
+      .motion-ready .slide.is-visible .lead,
+      .motion-ready .slide.is-visible .hero-actions { transition-delay: 0.42s; }
+      .motion-ready .slide.is-visible .value-card:nth-child(1),
+      .motion-ready .slide.is-visible .work-card:nth-child(1),
+      .motion-ready .slide.is-visible .legend-row:nth-child(1),
+      .motion-ready .slide.is-visible .timeline-step:nth-child(1) { transition-delay: 0.12s; }
+      .motion-ready .slide.is-visible .value-card:nth-child(2),
+      .motion-ready .slide.is-visible .work-card:nth-child(2),
+      .motion-ready .slide.is-visible .legend-row:nth-child(2),
+      .motion-ready .slide.is-visible .timeline-step:nth-child(2) { transition-delay: 0.2s; }
+      .motion-ready .slide.is-visible .value-card:nth-child(3),
+      .motion-ready .slide.is-visible .work-card:nth-child(3),
+      .motion-ready .slide.is-visible .legend-row:nth-child(3),
+      .motion-ready .slide.is-visible .timeline-step:nth-child(3) { transition-delay: 0.28s; }
+      .motion-ready .slide.is-visible .value-card:nth-child(4),
+      .motion-ready .slide.is-visible .work-card:nth-child(4),
+      .motion-ready .slide.is-visible .legend-row:nth-child(4),
+      .motion-ready .slide.is-visible .timeline-step:nth-child(4) { transition-delay: 0.36s; }
+      .motion-ready .slide.is-visible .work-card:nth-child(5),
+      .motion-ready .slide.is-visible .timeline-step:nth-child(5) { transition-delay: 0.44s; }
+      .motion-ready .slide.is-visible .work-card:nth-child(6) { transition-delay: 0.52s; }
+      .motion-ready .pie {
+        --skill-progress: 0;
+        opacity: 0.5;
+        transform: rotate(-12deg) scale(0.96);
+        transition: --skill-progress 1.15s cubic-bezier(0.2, 0.85, 0.2, 1), opacity 0.7s ease, transform 0.7s ease;
+      }
+      .motion-ready .slide.is-visible .pie {
+        --skill-progress: 1;
+        opacity: 1;
+        transform: rotate(0deg) scale(1);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+        }
+        .motion-ready .slide,
+        .motion-ready .slide-head,
+        .motion-ready .cover-title .title-main,
+        .motion-ready .cover-title .title-sub,
+        .motion-ready .lead,
+        .motion-ready .hero-actions,
+        .motion-ready .value-card,
+        .motion-ready .work-card,
+        .motion-ready .legend-row,
+        .motion-ready .timeline-step,
+        .motion-ready .link-panel,
+        .motion-ready .footer-line,
+        .motion-ready .pie {
+          --skill-progress: 1;
+          opacity: 1;
+          transform: none;
+        }
+      }
+
       @media (max-width: 980px) {
         .slide { min-height: auto; padding: 32px 22px 80px; }
         .hero,
@@ -506,6 +636,8 @@
         .value-grid,
         .works-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .approach-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .title-main { font-size: 64px; }
+        .title-sub { font-size: 22px; }
       }
       @media (max-width: 640px) {
         .nav { align-items: flex-start; flex-direction: column; padding: 12px 0; }
@@ -514,6 +646,8 @@
         .slide { border-radius: 10px; }
         .slide-head { font-size: 10px; }
         .hero h1 { font-size: 38px; }
+        .title-main { font-size: 44px; }
+        .title-sub { font-size: 18px; }
         .cover-art img { object-position: 66% center; }
         .cover-hero::before {
           background:
@@ -558,6 +692,8 @@
         .slide:last-child { page-break-after: auto; break-after: auto; }
         .btn { display: none; }
         .hero h1 { font-size: 42pt; }
+        .title-main { font-size: 56pt; }
+        .title-sub { font-size: 18pt; }
         .lead { font-size: 12pt; }
         .value-card strong { font-size: 30pt; }
         .thumb { height: 28mm; }
@@ -568,6 +704,24 @@
         }
         .pie { width: 76mm; }
         .legend { gap: 5mm; }
+        .motion-ready .slide,
+        .motion-ready .slide-head,
+        .motion-ready .cover-title .title-main,
+        .motion-ready .cover-title .title-sub,
+        .motion-ready .lead,
+        .motion-ready .hero-actions,
+        .motion-ready .value-card,
+        .motion-ready .work-card,
+        .motion-ready .legend-row,
+        .motion-ready .timeline-step,
+        .motion-ready .link-panel,
+        .motion-ready .footer-line,
+        .motion-ready .pie {
+          --skill-progress: 1;
+          opacity: 1 !important;
+          transform: none !important;
+          transition: none !important;
+        }
         .legend-row {
           grid-template-columns: 5mm 1fr;
           gap: 4mm;
@@ -604,11 +758,10 @@
         </div>
         <div class="hero-copy">
           <div class="slide-head"><span class="num">01</span><span>Cover</span></div>
-          <h1 id="hero-title">現場感覚とデジタルをつなぐポートフォリオ</h1>
-          <p class="lead">
-            販促・接客・運用の現場で見つけた課題を、Web、データ、AIツール、画像編集、GAS、DTP制作まで横断して形にします。
-            代表実績は詳細ページへのリンクとして整理し、このページは提案資料のようにA4横で印刷できます。
-          </p>
+          <h1 id="hero-title" class="cover-title">
+            <span class="title-main">Digital Portfolio</span>
+            <span class="title-sub">Yosuke Shimizu</span>
+          </h1>
           <div class="hero-actions">
             <a class="btn primary" href="#works">代表実績を見る</a>
             <button class="btn print" type="button" onclick="window.print()">A4横で印刷</button>
@@ -768,5 +921,23 @@
         <div class="footer-line"><span>YOSUKE SHIMIZU PORTFOLIO</span><span>06 / 06</span></div>
       </section>
     </main>
+    <script>
+      (() => {
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (reduceMotion || !("IntersectionObserver" in window)) return;
+
+        document.documentElement.classList.add("motion-ready");
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) entry.target.classList.add("is-visible");
+            });
+          },
+          { threshold: 0.18, rootMargin: "0px 0px -8% 0px" }
+        );
+
+        document.querySelectorAll(".slide").forEach((slide) => observer.observe(slide));
+      })();
+    </script>
   </body>
 </html>
