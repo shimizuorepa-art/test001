@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sales Dashboard | Web Application Samples</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="app-name"><a href="../../" style="color:inherit;text-decoration:none;font-size:11px">Back to Top</a> / 営業実績ダッシュボード</p>
+          <h1>取引先別 実績ダッシュボード</h1>
+          <p>取引先ごとの推移と次アクションを一覧化。数値はサンプルデータです。</p>
+        </div>
+        <span class="data-note">Sample Data</span>
+      </header>
+
+      <section class="presentation-note" aria-label="概要">
+        <div>
+          <span>Overview</span>
+          <strong>商談前に確認すべき情報を集約した営業支援画面</strong>
+        </div>
+        <p>取引先別の実績推移・比較・次アクションを一画面で把握できます。</p>
+      </section>
+
+      <section class="filter-bar" aria-label="表示条件">
+        <label>
+          チーム
+          <select id="officeFilter">
+            <option value="all">すべて</option>
+            <option value="toyohashi">販促整理サンプル</option>
+            <option value="tokai">東海エリア</option>
+            <option value="west">西日本エリア</option>
+          </select>
+        </label>
+        <label>
+          期間
+          <select id="periodFilter">
+            <option value="fy2025">2025年度</option>
+            <option value="last12">直近12か月</option>
+          </select>
+        </label>
+        <div class="segmented" aria-label="指標切替">
+          <button class="segment is-active" data-metric="orders" type="button">受付件数</button>
+          <button class="segment" data-metric="sales" type="button">成果</button>
+        </div>
+        <div class="segmented" aria-label="比較切替">
+          <button class="segment is-active" data-compare="previous" type="button">前年比</button>
+          <button class="segment" data-compare="target" type="button">目標比</button>
+        </div>
+        <label class="check-label">
+          <input id="hideInactive" type="checkbox" checked />
+          実績なしを非表示
+        </label>
+      </section>
+
+      <section class="summary-grid" aria-label="実績サマリー">
+        <article class="summary-card">
+          <span>期間合計</span>
+          <strong id="totalMetric">0</strong>
+          <small id="totalCompare"></small>
+        </article>
+        <article class="summary-card">
+          <span>伸びている取引先</span>
+          <div id="growthList"></div>
+        </article>
+        <article class="summary-card">
+          <span>確認したい取引先</span>
+          <div id="riskList"></div>
+        </article>
+        <article class="summary-card">
+          <span>営業支援メモ</span>
+          <p id="supportMemo"></p>
+        </article>
+      </section>
+
+      <section class="workspace">
+        <section class="matrix-panel">
+          <div class="section-head">
+            <div>
+              <h2>取引先 × 月次実績マトリクス</h2>
+              <p>各セルは当期値と比較率。クリックすると右側に推移と営業メモを表示します。</p>
+            </div>
+            <div class="legend" aria-label="色の凡例">
+              <span class="legend-bad">減少</span>
+              <span class="legend-flat">横ばい</span>
+              <span class="legend-good">伸長</span>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead id="matrixHead"></thead>
+              <tbody id="matrixBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <aside class="detail-panel">
+          <div class="section-head compact">
+            <div>
+              <h2 id="detailTitle">取引先詳細</h2>
+              <p id="detailSubtitle">月次セルを選択してください。</p>
+            </div>
+          </div>
+          <div class="metric-cards">
+            <div>
+              <span>当期</span>
+              <strong id="currentValue">-</strong>
+            </div>
+            <div>
+              <span>前年比</span>
+              <strong id="previousRate">-</strong>
+            </div>
+            <div>
+              <span>目標比</span>
+              <strong id="targetRate">-</strong>
+            </div>
+          </div>
+          <div class="chart" id="trendChart" aria-label="3年推移グラフ"></div>
+          <div class="monthly-table">
+            <h3>月別内訳</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>月</th>
+                  <th>当期</th>
+                  <th>前年</th>
+                  <th>目標</th>
+                  <th>評価</th>
+                </tr>
+              </thead>
+              <tbody id="detailRows"></tbody>
+            </table>
+          </div>
+          <div class="action-box">
+            <h3>営業担当への次アクション案</h3>
+            <ul id="actionList"></ul>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

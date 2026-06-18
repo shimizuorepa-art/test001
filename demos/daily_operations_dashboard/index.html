@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日々の業務管理システム（匿名デモ）</title>
+<style>
+:root{
+  --forest:#123325;--moss:#0f766e;--leaf:#15803d;--lime:#86cfa0;
+  --cream:#f5f7fa;--sand:#edf4ee;--white:#ffffff;
+  --amber:#b45309;--rust:#be123c;--sky:#0b73b7;
+  --ink:#172033;--muted:#667085;--border:#d9e2ee;
+  --surface-soft:#f8fafc;--accent-soft:#ecfdf3;--line-strong:#b8c5d8;
+  --status-done:#15803d;--status-wip:#0b73b7;--status-todo:#667085;
+  --shadow:0 14px 34px rgba(16,24,40,.08);
+  --shadow-soft:0 10px 24px rgba(16,24,40,.06);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;line-height:1.5;}
+
+/* ===== TOP HEADER ===== */
+.top-header{
+  background:rgba(255,255,255,.94);backdrop-filter:blur(14px);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;height:52px;position:sticky;top:0;z-index:300;
+  border-bottom:1px solid var(--border);
+  box-shadow:0 8px 22px rgba(16,24,40,.04);
+}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:32px;height:32px;background:var(--accent-soft);border:1px solid #bde9db;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.logo-text{font-size:14px;font-weight:900;color:var(--ink);letter-spacing:0;}
+.logo-sub{font-size:10px;color:var(--muted);font-family:Menlo,Consolas,monospace;margin-top:1px;}
+.top-meta{font-size:11px;color:var(--muted);font-family:Menlo,Consolas,monospace;}
+
+/* ===== MODULE TABS ===== */
+.module-tabs{
+  display:flex;background:#fff;
+  position:sticky;top:52px;z-index:200;
+  padding:8px 28px;gap:8px;border-bottom:1px solid var(--border);
+  justify-content:center;
+}
+.mod-tab{
+  flex:0 1 230px;padding:10px 16px;text-align:center;cursor:pointer;
+  font-size:13px;font-weight:800;color:var(--muted);
+  border:1px solid transparent;border-radius:8px;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.mod-tab:hover{color:var(--moss);background:var(--accent-soft);border-color:#bde9db;}
+.mod-tab.active{color:#fff;border-color:var(--moss);background:var(--moss);}
+.mod-badge{
+  font-size:10px;padding:2px 7px;border-radius:999px;
+  background:#f1f5f9;color:var(--muted);font-weight:800;
+}
+.mod-tab.active .mod-badge{background:rgba(255,255,255,.2);color:#fff;}
+
+/* ===== MODULE PANELS ===== */
+.module{display:none;min-height:calc(100vh - 104px);}
+.module.active{display:block;}
+
+/* ===== DEMO NOTE ===== */
+.demo-note{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.48fr);
+  gap:16px;align-items:center;margin:18px 28px 0;padding:16px 18px;
+  border:1px solid #bde9db;border-radius:8px;background:#f0fdf8;
+  box-shadow:var(--shadow-soft);
+}
+.demo-note-label{display:inline-flex;align-items:center;margin-bottom:6px;color:var(--moss);font-size:12px;font-weight:900;}
+.demo-note h1{font-size:18px;line-height:1.35;color:var(--ink);letter-spacing:0;}
+.demo-note p{margin-top:6px;color:#245346;font-size:13px;line-height:1.7;}
+.demo-note-list{display:grid;gap:7px;margin:0;padding:0;list-style:none;}
+.demo-note-list li{position:relative;padding-left:16px;color:#245346;font-size:12px;font-weight:800;line-height:1.55;}
+.demo-note-list li::before{content:'';position:absolute;left:0;top:.7em;width:6px;height:6px;border-radius:999px;background:var(--moss);}
+.demo-caution{grid-column:1/-1;margin:0;padding-top:10px;border-top:1px solid rgba(15,118,110,.14);color:#577067;font-size:11px;line-height:1.6;}
+
+/* ===== SECTION HEADER ===== */
+.sec-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 28px 0;margin-bottom:16px;
+}
+.sec-title{font-size:14px;font-weight:900;color:var(--ink);
+  display:flex;align-items:center;gap:8px;
+}
+.sec-title::before{content:'';width:4px;height:18px;background:var(--moss);border-radius:2px;display:inline-block;}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;}
+.filter-select{
+  min-height:36px;padding:6px 12px;border-radius:8px;border:1px solid var(--border);
+  background:var(--white);font-size:12px;font-weight:800;color:var(--muted);
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;cursor:pointer;
+}
+.filter-select:focus{outline:none;border-color:var(--moss);box-shadow:0 0 0 3px rgba(15,118,110,.12);}
+.btn-sm{
+  min-height:36px;padding:7px 13px;border-radius:8px;border:none;
+  font-size:12px;font-weight:800;cursor:pointer;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+}
+.btn-primary{background:var(--moss);color:#fff;}
+.btn-amber{background:var(--amber);color:#fff;}
+.btn-outline{background:#fff;border:1px solid var(--border);color:var(--muted);}
+
+/* ===== GRID LAYOUTS ===== */
+.pad{padding:0 28px 28px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+
+/* ===== CARDS ===== */
+.card{background:var(--white);border-radius:8px;padding:18px;border:1px solid var(--border);box-shadow:var(--shadow);}
+.card-title{font-size:13px;font-weight:900;color:var(--ink);margin-bottom:14px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.card-label{font-size:11px;font-weight:900;letter-spacing:0;color:var(--moss);}
+.card.wide{grid-column:1/-1;}
+.card.span2{grid-column:span 2;}
+
+/* ===== KPI ===== */
+.kpi-val{font-size:28px;font-weight:900;color:var(--ink);line-height:1;}
+.kpi-unit{font-size:13px;font-weight:400;color:var(--muted);}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:5px;}
+.delta-up{color:var(--leaf);font-weight:800;}
+.delta-dn{color:var(--rust);font-weight:700;}
+
+/* ===== BAR CHART ===== */
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.bar-row:last-child{margin-bottom:0;}
+.bar-lbl{font-size:11px;color:var(--muted);width:72px;text-align:right;flex-shrink:0;}
+.bar-track{flex:1;height:16px;background:var(--sand);border-radius:5px;overflow:hidden;position:relative;}
+.bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:7px;font-size:10px;font-weight:700;color:#fff;transition:width .8s ease;}
+.bar-val{font-size:11px;color:var(--muted);width:36px;text-align:right;flex-shrink:0;}
+
+/* ===== TABLE ===== */
+.tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.tbl th{padding:8px 10px;background:var(--surface-soft);color:#344054;font-size:10px;letter-spacing:.04em;text-align:left;font-weight:900;border-bottom:1px solid var(--border);}
+.tbl td{padding:9px 10px;border-bottom:1px solid var(--border);}
+.tbl tr:hover td{background:#f8fbf9;}
+.tbl tr:last-child td{border:none;}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;}
+.tag-g{background:#E8F5E9;color:#2E6B32;}
+.tag-y{background:#E3F0FB;color:#1A5580;}
+.tag-i{background:#FFF3E0;color:#C05000;}
+.tag-all{background:var(--accent-soft);color:var(--moss);}
+.trend-up{color:var(--rust);font-weight:700;}
+.trend-dn{color:var(--leaf);font-weight:700;}
+.trend-flat{color:var(--muted);}
+
+/* ===== YoY COMPARE ===== */
+.yoy-block{margin-bottom:14px;}
+.yoy-block:last-child{margin-bottom:0;}
+.yoy-category{font-size:11px;font-weight:900;color:var(--ink);margin-bottom:6px;}
+.yoy-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.yoy-work{font-size:10px;color:var(--muted);width:80px;flex-shrink:0;}
+.yoy-bars{flex:1;display:flex;flex-direction:column;gap:2px;}
+.yoy-bar-now{height:8px;border-radius:3px;background:var(--leaf);}
+.yoy-bar-old{height:8px;border-radius:3px;background:var(--sand);}
+.yoy-pct{font-size:10px;width:40px;text-align:right;flex-shrink:0;font-weight:700;}
+
+/* ===== BASE COMPARE ===== */
+.base-compare-header{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px;font-size:10px;color:var(--muted);font-weight:700;text-align:center;}
+.base-compare-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);}
+.base-compare-row:last-child{border:none;}
+.base-work{font-size:11px;color:var(--ink);}
+.base-val{font-size:12px;font-weight:700;text-align:center;padding:4px 6px;border-radius:6px;}
+.best{background:#E8F5E9;color:var(--leaf);}
+.mid{background:#FFF3E0;color:#A05000;}
+.slow{background:#FEF0EE;color:var(--rust);}
+
+/* ===== PLAN MODULE ===== */
+.plan-tabs{display:flex;gap:6px;border-bottom:1px solid var(--border);padding:8px 28px;background:#fff;}
+.plan-tab{padding:9px 14px;font-size:12px;font-weight:800;color:var(--muted);cursor:pointer;border:1px solid transparent;border-radius:8px;transition:all .15s;}
+.plan-tab.active{color:#fff;border-color:var(--moss);background:var(--moss);}
+.plan-panel{display:none;padding:20px 28px 28px;}
+.plan-panel.active{display:block;}
+
+/* ===== WEEKLY PLAN ===== */
+.week-nav{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.week-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--muted);}
+.week-label{font-size:13px;font-weight:900;color:var(--ink);}
+.legend{display:flex;gap:14px;margin-left:auto;font-size:10px;color:var(--muted);}
+.legend-item{display:flex;align-items:center;gap:5px;}
+.legend-dot{width:10px;height:10px;border-radius:50%;}
+
+.week-table{width:100%;border-collapse:collapse;font-size:12px;}
+.week-table th{padding:9px 10px;text-align:center;font-size:11px;font-weight:700;color:var(--muted);border-bottom:2px solid var(--border);background:#fff;}
+.week-table th.day-today{background:var(--moss);color:#fff;border-radius:6px 6px 0 0;}
+.week-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top;}
+.week-table tr:last-child td{border:none;}
+.task-cell{display:flex;flex-direction:column;gap:4px;}
+.task-chip{
+  padding:5px 8px;border-radius:6px;font-size:11px;font-weight:600;
+  cursor:pointer;transition:opacity .15s;line-height:1.4;
+}
+.task-chip.done{background:#e8f5e9;color:var(--leaf);text-decoration:line-through;opacity:.82;}
+.task-chip.wip{background:#E3EEF8;color:var(--sky);}
+.task-chip.todo{background:#f1f5f9;color:#344054;}
+.task-chip:hover{opacity:.75;}
+.task-time{font-size:10px;opacity:.7;}
+.add-task{font-size:10px;color:var(--moss);cursor:pointer;padding:4px;border-radius:4px;font-weight:800;}
+.add-task:hover{background:rgba(15,118,110,.1);}
+.row-label{font-size:12px;font-weight:900;color:var(--ink);}
+.row-sub{font-size:10px;color:var(--muted);}
+
+/* ===== DAILY PLAN ===== */
+.daily-header{
+  display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;margin-bottom:18px;
+}
+.daily-meta{font-size:12px;color:var(--muted);margin-top:4px;}
+.print-btn{
+  padding:8px 18px;background:var(--moss);color:#fff;border:none;
+  border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;display:flex;align-items:center;gap:6px;
+}
+.daily-grid{display:grid;grid-template-columns:1fr auto;gap:20px;}
+.daily-tasks{display:flex;flex-direction:column;gap:10px;}
+.daily-row{
+  background:var(--white);border-radius:8px;padding:14px 16px;
+  border:1px solid var(--border);display:grid;
+  grid-template-columns:28px 90px 1fr 70px 70px 80px;
+  gap:10px;align-items:center;
+}
+.daily-row.done{opacity:.76;border-left:4px solid var(--leaf);}
+.daily-row.wip{border-left:4px solid var(--sky);}
+.daily-row.todo{border-left:4px solid #cbd5e1;}
+.dr-num{width:24px;height:24px;border-radius:7px;background:var(--moss);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;}
+.dr-loc{font-size:12px;font-weight:900;color:var(--ink);}
+.dr-work{font-size:12px;color:var(--ink);}
+.dr-staff{font-size:11px;color:var(--muted);}
+.dr-time{font-size:11px;color:var(--muted);}
+.dr-ave{font-size:11px;color:var(--moss);font-weight:800;}
+.dr-status{display:inline-block;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;}
+.st-done{background:#e8f5e9;color:var(--leaf);}
+.st-wip{background:#E3EEF8;color:var(--sky);}
+.st-todo{background:#f1f5f9;color:var(--muted);}
+
+.daily-summary{width:200px;}
+.summary-card{background:var(--white);border-radius:8px;padding:14px;border:1px solid var(--border);margin-bottom:12px;box-shadow:var(--shadow-soft);}
+.sc-title{font-size:10px;font-weight:900;letter-spacing:.08em;color:var(--moss);text-transform:uppercase;margin-bottom:10px;}
+.sc-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid var(--border);}
+.sc-row:last-child{border:none;}
+.sc-key{color:var(--muted);}
+.sc-val{font-weight:900;color:var(--ink);}
+
+/* ===== PRINT AREA ===== */
+.print-area{display:none;}
+@media print{
+  .top-header,.module-tabs,.plan-tabs,.daily-header,.no-print{display:none!important;}
+  .print-area{display:block;}
+  .daily-grid{display:block;}
+  .daily-summary{display:none;}
+  body{background:white;}
+}
+
+/* ===== SHIFT MODULE ===== */
+.shift-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.shift-period{font-size:13px;font-weight:900;color:var(--ink);}
+.shift-table{width:100%;border-collapse:collapse;font-size:12px;}
+.shift-table th{padding:9px 10px;background:var(--surface-soft);color:#344054;font-size:11px;font-weight:900;text-align:center;border-bottom:1px solid var(--border);}
+.shift-table td{padding:9px 10px;border-bottom:1px solid var(--border);text-align:center;}
+.shift-table tr:hover td{background:#f8fbf9;}
+.shift-cell{
+  display:inline-block;padding:4px 10px;border-radius:6px;
+  font-size:11px;font-weight:700;min-width:54px;
+}
+.shift-on{background:#E8F5E9;color:var(--moss);}
+.shift-off{background:#f1f5f9;color:var(--muted);}
+.shift-half{background:#FEF8E4;color:var(--amber);}
+.shift-total{font-weight:900;color:var(--ink);}
+.team-badge{padding:3px 10px;border-radius:999px;font-size:10px;font-weight:900;}
+.team-a{background:#E8F5E9;color:var(--moss);}
+.team-b{background:#E3EEF8;color:var(--sky);}
+.archive-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+.archive-item{
+  padding:6px 14px;border-radius:999px;background:var(--white);
+  border:1px solid var(--border);font-size:11px;color:var(--muted);cursor:pointer;
+  font-weight:800;transition:all .15s;
+}
+.archive-item:hover{border-color:var(--moss);color:var(--moss);}
+.archive-item.current{background:var(--moss);border-color:var(--moss);color:#fff;}
+
+/* ===== ANALYSIS MODULE ===== */
+.analysis-filters{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  padding:14px 28px;background:var(--white);border-bottom:1px solid var(--border);
+}
+.af-label{font-size:11px;color:var(--muted);font-weight:900;}
+
+/* ===== TABS within analysis ===== */
+.analysis-tabs{display:flex;gap:6px;border-bottom:1px solid var(--border);padding:8px 28px;background:#fff;}
+.an-tab{padding:9px 14px;font-size:12px;font-weight:800;color:var(--muted);cursor:pointer;border:1px solid transparent;border-radius:8px;}
+.an-tab.active{color:#fff;border-color:var(--moss);background:var(--moss);}
+.an-panel{display:none;padding:20px 28px 28px;}
+.an-panel.active{display:block;}
+
+/* ===== TOOLTIP ===== */
+.tooltip{position:relative;}
+.tooltip-text{
+  display:none;position:absolute;bottom:110%;left:50%;transform:translateX(-50%);
+  background:var(--ink);color:#fff;font-size:10px;padding:5px 10px;border-radius:6px;
+  white-space:nowrap;z-index:999;
+}
+.tooltip:hover .tooltip-text{display:block;}
+
+@media(max-width:900px){
+  .grid2,.grid3,.grid4{grid-template-columns:1fr;}
+  .demo-note{grid-template-columns:1fr;}
+  .card.span2{grid-column:1;}
+  .daily-grid{grid-template-columns:1fr;}
+  .daily-summary{width:100%;}
+  .daily-row{grid-template-columns:1fr 1fr;font-size:11px;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP HEADER -->
+<header class="top-header">
+  <div class="logo">
+    <div class="logo-icon">🌿</div>
+    <div>
+      <div class="logo-text">日々の業務管理システム</div>
+      <div class="logo-sub">ANONYMIZED DEMO v1.0</div>
+    </div>
+  </div>
+  <div class="top-meta" id="clock">デモデータ — 拠点A・拠点B・拠点C</div>
+</header>
+
+<!-- MODULE TABS -->
+<nav class="module-tabs">
+  <div class="mod-tab active" onclick="switchModule('record')">
+    📱 作業時間記録 <span class="mod-badge">QR</span>
+  </div>
+  <div class="mod-tab" onclick="switchModule('analysis')">
+    📊 分析 <span class="mod-badge">DATA</span>
+  </div>
+  <div class="mod-tab" onclick="switchModule('plan')">
+    📅 計画 <span class="mod-badge">PLAN</span>
+  </div>
+</nav>
+
+<section class="demo-note" aria-label="このサンプル画面の説明">
+  <div>
+    <span class="demo-note-label">日々の業務管理システム 試作画面</span>
+    <h1>報告・計画・分析をつなげ、現場と事務作業の負担を軽くするためのサンプルです。</h1>
+    <p>
+      報告はスマホのアンケート方式で簡単・時短化し、計画は選択式で迷わず入力できる形を想定しています。
+      分析画面で実績を確認し、次の計画へ反映することで、日々のPDCAを回しやすくする試作です。
+    </p>
+  </div>
+  <ul class="demo-note-list">
+    <li>現場責任者と協議しながら試作中</li>
+    <li>スプレッドシート連携で低コストなテスト運用から開始</li>
+    <li>入力・集計・確認の手間を減らすことを重視</li>
+  </ul>
+  <p class="demo-caution">※ サンプル用のダミーデータ使用及び、機能や表示も簡略化しています。</p>
+</section>
+
+<!-- ================================================================ -->
+<!-- MODULE 1: 作業時間記録 -->
+<!-- ================================================================ -->
+<div id="mod-record" class="module active">
+  <div class="sec-header">
+    <div class="sec-title">今日の記録状況（サンプル日）</div>
+    <div class="filter-row">
+      <select class="filter-select"><option>拠点A</option><option>拠点B</option><option>拠点C</option></select>
+    </div>
+  </div>
+  <div class="pad">
+    <div class="grid4" style="margin-bottom:18px;">
+      <div class="card">
+        <div class="card-label">本日の作業件数</div>
+        <div class="kpi-val" style="margin-top:8px;">42<span class="kpi-unit">件</span></div>
+        <div class="kpi-sub"><span class="delta-up">▲ +5</span> 昨日比</div>
+      </div>
+      <div class="card">
+        <div class="card-label">稼働スタッフ</div>
+        <div class="kpi-val" style="margin-top:8px;">18<span class="kpi-unit">名</span></div>
+        <div class="kpi-sub">うち残業 3名</div>
+      </div>
+      <div class="card">
+        <div class="card-label">総作業時間（今日）</div>
+        <div class="kpi-val" style="margin-top:8px;">124<span class="kpi-unit">h</span></div>
+        <div class="kpi-sub">計画比 <span class="delta-dn">▼ −8h</span></div>
+      </div>
+      <div class="card">
+        <div class="card-label">今月累計</div>
+        <div class="kpi-val" style="margin-top:8px;">842<span class="kpi-unit">h</span></div>
+        <div class="kpi-sub"><span class="delta-up">▲ +12%</span> 前月比</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <!-- QR設置状況 -->
+      <div class="card">
+        <div class="card-title">QRコード設置状況（拠点A チームA）</div>
+        <table class="tbl">
+          <thead><tr><th>区画</th><th>分類</th><th>QR状態</th><th>最終スキャン</th></tr></thead>
+          <tbody>
+            <tr><td>区画A</td><td>分類B</td><td><span style="color:var(--leaf);font-weight:700;">✅ 設置済</span></td><td>午前</td></tr>
+            <tr><td>区画B</td><td>分類B</td><td><span style="color:var(--leaf);font-weight:700;">✅ 設置済</span></td><td>午前</td></tr>
+            <tr><td>区画C</td><td>分類A</td><td><span style="color:var(--leaf);font-weight:700;">✅ 設置済</span></td><td>午前</td></tr>
+            <tr><td>区画D</td><td>分類B</td><td><span style="color:var(--leaf);font-weight:700;">✅ 設置済</span></td><td>午前</td></tr>
+            <tr><td>区画E</td><td>分類E</td><td><span style="color:var(--amber);font-weight:700;">⚠️ 準備中</span></td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 今日のリアルタイムログ -->
+      <div class="card">
+        <div class="card-title">本日のリアルタイムログ</div>
+        <table class="tbl">
+          <thead><tr><th>時刻</th><th>スタッフ</th><th>対象</th><th>作業</th><th>状態</th></tr></thead>
+          <tbody>
+            <tr><td>午前</td><td>スタッフA</td><td>区画A</td><td>作業A</td><td><span class="dr-status st-wip">進行中</span></td></tr>
+            <tr><td>午前</td><td>スタッフB</td><td>区画B</td><td>作業B</td><td><span class="dr-status st-done">完了</span></td></tr>
+            <tr><td>午前</td><td>スタッフC</td><td>区画C</td><td>作業C</td><td><span class="dr-status st-wip">進行中</span></td></tr>
+            <tr><td>午前</td><td>スタッフE</td><td>区画D</td><td>作業D</td><td><span class="dr-status st-done">完了</span></td></tr>
+            <tr><td>午前</td><td>スタッフD</td><td>区画A</td><td>作業E</td><td><span class="dr-status st-done">完了</span></td></tr>
+            <tr><td>午前</td><td>スタッフF</td><td>区画C</td><td>作業F</td><td><span class="dr-status st-done">完了</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 月次作業時間 -->
+      <div class="card">
+        <div class="card-title">今月の分類別作業時間（拠点A）</div>
+        <div class="bar-row"><div class="bar-lbl">分類A</div><div class="bar-track"><div class="bar-fill" style="width:88%;background:#4A8A50;">312h</div></div><div class="bar-val">312h</div></div>
+        <div class="bar-row"><div class="bar-lbl">分類B</div><div class="bar-track"><div class="bar-fill" style="width:72%;background:#7DC45F;">256h</div></div><div class="bar-val">256h</div></div>
+        <div class="bar-row"><div class="bar-lbl">分類C</div><div class="bar-track"><div class="bar-fill" style="width:48%;background:#C8820A;">168h</div></div><div class="bar-val">168h</div></div>
+        <div class="bar-row"><div class="bar-lbl">分類D</div><div class="bar-track"><div class="bar-fill" style="width:30%;background:#1F6090;">106h</div></div><div class="bar-val">106h</div></div>
+      </div>
+
+      <!-- 標準時間の更新状況 -->
+      <div class="card">
+        <div class="card-title">標準時間の更新状況（今月）</div>
+        <table class="tbl">
+          <thead><tr><th>作業</th><th>今月標準</th><th>前月</th><th>傾向</th></tr></thead>
+          <tbody>
+            <tr><td>作業A（分類B）</td><td><strong>24分</strong></td><td>26分</td><td class="trend-dn">▼ 効率改善</td></tr>
+            <tr><td>作業B</td><td><strong>11分/千単位</strong></td><td>13分</td><td class="trend-dn">▼ 効率改善</td></tr>
+            <tr><td>作業C（分類A）</td><td><strong>8分/単位</strong></td><td>7分</td><td class="trend-up">▲ 要確認</td></tr>
+            <tr><td>作業F</td><td><strong>180分</strong></td><td>180分</td><td class="trend-flat">→ 安定</td></tr>
+            <tr><td>作業D（分類B）</td><td><strong>22分</strong></td><td>24分</td><td class="trend-dn">▼ 効率改善</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- MODULE 2: 分析 -->
+<!-- ================================================================ -->
+<div id="mod-analysis" class="module">
+  <div class="analysis-filters">
+    <span class="af-label">絞り込み：</span>
+    <select class="filter-select"><option>全拠点</option><option>拠点A</option><option>拠点B</option><option>拠点C</option></select>
+    <select class="filter-select"><option>全分類</option><option>分類A</option><option>分類B</option><option>分類C</option><option>分類D</option><option>分類E</option></select>
+    <select class="filter-select"><option>今年</option><option>昨年</option></select>
+    <select class="filter-select"><option>4月</option><option>3月</option><option>2月</option><option>1月</option></select>
+  </div>
+
+  <div class="analysis-tabs">
+    <div class="an-tab active" onclick="switchAnTab('yoy')">📈 昨年対比</div>
+    <div class="an-tab" onclick="switchAnTab('base')">🏭 拠点別 標準時間比較</div>
+    <div class="an-tab" onclick="switchAnTab('monthly')">📅 月次サマリー</div>
+  </div>
+
+  <!-- 昨年対比パネル -->
+  <div id="an-yoy" class="an-panel active">
+    <div class="grid2">
+      <!-- 分類×拠点×昨年対比テーブル -->
+      <div class="card wide">
+        <div class="card-title">
+          分類別×作業 前年同月対比
+          <div>
+            <span class="tag tag-all">全拠点合計</span>
+          </div>
+        </div>
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>分類</th><th>作業</th>
+              <th>今年</th><th>昨年</th>
+              <th>対比</th>
+              <th>拠点A</th><th>拠点B</th><th>拠点C</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td rowspan="3" style="font-weight:700;background:#F4FAF4;">分類A</td>
+              <td>作業C</td><td>312h</td><td>288h</td><td class="trend-up">▲ +8.3%</td>
+              <td><span class="tag tag-g">155h</span></td><td><span class="tag tag-i">92h</span></td><td><span class="tag tag-y">65h</span></td></tr>
+            <tr><td>作業F</td><td>188h</td><td>210h</td><td class="trend-dn">▼ −10.5%</td>
+              <td><span class="tag tag-g">90h</span></td><td><span class="tag tag-i">58h</span></td><td><span class="tag tag-y">40h</span></td></tr>
+            <tr><td>作業G</td><td>44h</td><td>40h</td><td class="trend-up">▲ +10.0%</td>
+              <td><span class="tag tag-g">22h</span></td><td><span class="tag tag-i">12h</span></td><td><span class="tag tag-y">10h</span></td></tr>
+            <tr><td rowspan="3" style="font-weight:700;background:#F4FAF4;">分類B</td>
+              <td>作業A</td><td>256h</td><td>240h</td><td class="trend-up">▲ +6.7%</td>
+              <td><span class="tag tag-g">142h</span></td><td><span class="tag tag-i">68h</span></td><td><span class="tag tag-y">46h</span></td></tr>
+            <tr><td>作業B</td><td>98h</td><td>112h</td><td class="trend-dn">▼ −12.5%</td>
+              <td><span class="tag tag-g">52h</span></td><td><span class="tag tag-i">28h</span></td><td><span class="tag tag-y">18h</span></td></tr>
+            <tr><td>作業D</td><td>74h</td><td>78h</td><td class="trend-dn">▼ −5.1%</td>
+              <td><span class="tag tag-g">38h</span></td><td><span class="tag tag-i">22h</span></td><td><span class="tag tag-y">14h</span></td></tr>
+            <tr><td rowspan="2" style="font-weight:700;background:#F4FAF4;">分類C</td>
+              <td>作業H</td><td>168h</td><td>152h</td><td class="trend-up">▲ +10.5%</td>
+              <td><span class="tag tag-g">82h</span></td><td><span class="tag tag-i">—</span></td><td><span class="tag tag-y">86h</span></td></tr>
+            <tr><td>作業I</td><td>120h</td><td>130h</td><td class="trend-dn">▼ −7.7%</td>
+              <td><span class="tag tag-g">60h</span></td><td><span class="tag tag-i">—</span></td><td><span class="tag tag-y">60h</span></td></tr>
+            <tr><td rowspan="2" style="font-weight:700;background:#F4FAF4;">分類D</td>
+              <td>作業D</td><td>106h</td><td>115h</td><td class="trend-dn">▼ −7.8%</td>
+              <td><span class="tag tag-g">55h</span></td><td><span class="tag tag-i">—</span></td><td><span class="tag tag-y">51h</span></td></tr>
+            <tr><td>作業F</td><td>88h</td><td>80h</td><td class="trend-up">▲ +10.0%</td>
+              <td><span class="tag tag-g">45h</span></td><td><span class="tag tag-i">—</span></td><td><span class="tag tag-y">43h</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 拠点別YoY棒グラフ的なもの -->
+      <div class="card span2">
+        <div class="card-title">分類別 昨年対比バー（今月4月）</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--moss);margin-bottom:10px;">🟢 拠点A</div>
+            <div class="yoy-block">
+              <div class="yoy-category">分類A</div>
+              <div class="yoy-row"><div class="yoy-work">作業C</div><div class="yoy-bars"><div class="yoy-bar-now" style="width:78%;"></div><div class="yoy-bar-old" style="width:72%;"></div></div><div class="yoy-pct trend-up">+8%</div></div>
+              <div class="yoy-row"><div class="yoy-work">作業F</div><div class="yoy-bars"><div class="yoy-bar-now" style="width:45%;"></div><div class="yoy-bar-old" style="width:52%;"></div></div><div class="yoy-pct trend-dn">−11%</div></div>
+            </div>
+            <div class="yoy-block">
+              <div class="yoy-category">分類B</div>
+              <div class="yoy-row"><div class="yoy-work">作業A</div><div class="yoy-bars"><div class="yoy-bar-now" style="width:71%;"></div><div class="yoy-bar-old" style="width:65%;"></div></div><div class="yoy-pct trend-up">+9%</div></div>
+              <div class="yoy-row"><div class="yoy-work">作業B</div><div class="yoy-bars"><div class="yoy-bar-now" style="width:38%;"></div><div class="yoy-bar-old" style="width:48%;"></div></div><div class="yoy-pct trend-dn">−13%</div></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--sky);margin-bottom:10px;">🔵 拠点B</div>
+            <div class="yoy-block">
+              <div class="yoy-category">分類A</div>
+              <div class="yoy-row"><div class="yoy-work">作業C</div><div class="yoy-bars"><div class="yoy-bar-now" style="width:60%;background:var(--sky);"></div><div class="yoy-bar-old" style="width:55%;"></div></div><div class="yoy-pct trend-up">+7%</div></div>
+              <div class="yoy-row"><div class="yoy-work">作業F</div><div class="yoy-bars"><div class="yoy-bar-now" style="width:40%;background:var(--sky);"></div><div class="yoy-bar-old" style="width:44%;"></div></div><div class="yoy-pct trend-dn">−9%</div></div>
+            </div>
+            <div class="yoy-block">
+              <div class="yoy-category">分類B</div>
+              <div class="yoy-row"><div class="yoy-work">作業A</div><div class="yoy-bars"><div class="yoy-bar-now" style="width:50%;background:var(--sky);"></div><div class="yoy-bar-old" style="width:45%;"></div></div><div class="yoy-pct trend-up">+6%</div></div>
+              <div class="yoy-row"><div class="yoy-work">作業B</div><div class="yoy-bars"><div class="yoy-bar-now" style="width:28%;background:var(--sky);"></div><div class="yoy-bar-old" style="width:34%;"></div></div><div class="yoy-pct trend-dn">−12%</div></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--amber);margin-bottom:10px;">🟠 拠点C</div>
+            <div class="yoy-block">
+              <div class="yoy-category">分類C</div>
+              <div class="yoy-row"><div class="yoy-work">作業H</div><div class="yoy-bars"><div class="yoy-bar-now" style="width:60%;background:var(--amber);"></div><div class="yoy-bar-old" style="width:52%;"></div></div><div class="yoy-pct trend-up">+11%</div></div>
+              <div class="yoy-row"><div class="yoy-work">作業I</div><div class="yoy-bars"><div class="yoy-bar-now" style="width:42%;background:var(--amber);"></div><div class="yoy-bar-old" style="width:50%;"></div></div><div class="yoy-pct trend-dn">−8%</div></div>
+            </div>
+            <div class="yoy-block">
+              <div class="yoy-category">分類D</div>
+              <div class="yoy-row"><div class="yoy-work">作業D</div><div class="yoy-bars"><div class="yoy-bar-now" style="width:45%;background:var(--amber);"></div><div class="yoy-bar-old" style="width:50%;"></div></div><div class="yoy-pct trend-dn">−8%</div></div>
+              <div class="yoy-row"><div class="yoy-work">作業F</div><div class="yoy-bars"><div class="yoy-bar-now" style="width:38%;background:var(--amber);"></div><div class="yoy-bar-old" style="width:32%;"></div></div><div class="yoy-pct trend-up">+10%</div></div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:14px;font-size:10px;color:var(--muted);">
+          <span><span style="display:inline-block;width:12px;height:6px;background:var(--leaf);border-radius:2px;margin-right:4px;vertical-align:middle;"></span>今年</span>
+          <span><span style="display:inline-block;width:12px;height:6px;background:var(--sand);border-radius:2px;margin-right:4px;vertical-align:middle;"></span>昨年</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 拠点別 標準時間比較パネル -->
+  <div id="an-base" class="an-panel">
+    <div class="grid2">
+      <div class="card wide">
+        <div class="card-title">作業別 標準時間 拠点対比（分/人/件）— 今月4月</div>
+        <div style="margin-bottom:16px;font-size:11px;color:var(--muted);">
+          <span style="background:#E8F5E9;color:var(--moss);padding:2px 8px;border-radius:4px;font-weight:700;margin-right:8px;">緑=最短（最効率）</span>
+          <span style="background:#FFF3E0;color:var(--amber);padding:2px 8px;border-radius:4px;font-weight:700;margin-right:8px;">黄=中間</span>
+          <span style="background:#FEF0EE;color:var(--rust);padding:2px 8px;border-radius:4px;font-weight:700;">赤=最長</span>
+        </div>
+        <div class="base-compare-header">
+          <div>作業（分類）</div><div>拠点A</div><div>拠点B</div><div>拠点C</div>
+        </div>
+        <div class="base-compare-row">
+          <div class="base-work">作業C（分類A）</div>
+          <div><span class="base-val best">8分</span></div>
+          <div><span class="base-val mid">9分</span></div>
+          <div><span class="base-val slow">10分</span></div>
+        </div>
+        <div class="base-compare-row">
+          <div class="base-work">作業F（分類A）</div>
+          <div><span class="base-val mid">175分</span></div>
+          <div><span class="base-val best">168分</span></div>
+          <div><span class="base-val slow">185分</span></div>
+        </div>
+        <div class="base-compare-row">
+          <div class="base-work">作業A（分類B）</div>
+          <div><span class="base-val best">24分</span></div>
+          <div><span class="base-val mid">26分</span></div>
+          <div><span class="base-val slow">28分</span></div>
+        </div>
+        <div class="base-compare-row">
+          <div class="base-work">作業B（分類B）</div>
+          <div><span class="base-val mid">11分/千単位</span></div>
+          <div><span class="base-val best">10分/千単位</span></div>
+          <div><span class="base-val slow">13分/千単位</span></div>
+        </div>
+        <div class="base-compare-row">
+          <div class="base-work">作業H（分類C）</div>
+          <div><span class="base-val best">185分</span></div>
+          <div><span class="base-val slow">—</span></div>
+          <div><span class="base-val mid">192分</span></div>
+        </div>
+        <div class="base-compare-row">
+          <div class="base-work">作業D（分類D）</div>
+          <div><span class="base-val best">118分</span></div>
+          <div><span class="base-val slow">—</span></div>
+          <div><span class="base-val mid">122分</span></div>
+        </div>
+        <div class="base-compare-row">
+          <div class="base-work">作業G（分類E）</div>
+          <div><span class="base-val mid">48分</span></div>
+          <div><span class="base-val best">45分</span></div>
+          <div><span class="base-val slow">52分</span></div>
+        </div>
+        <div class="base-compare-row">
+          <div class="base-work">作業J</div>
+          <div><span class="base-val mid">88分</span></div>
+          <div><span class="base-val best">82分</span></div>
+          <div><span class="base-val slow">95分</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">拠点ごとの強み・弱みサマリー</div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="border-left:4px solid var(--leaf);padding:10px 14px;background:#F4FAF4;border-radius:0 8px 8px 0;">
+            <div style="font-size:12px;font-weight:700;color:var(--moss);margin-bottom:5px;">🟢 拠点A</div>
+            <div style="font-size:11px;color:var(--muted);line-height:1.7;">
+              ✅ 作業A・作業Cが最短<br>
+              ✅ 分類A関連に強み<br>
+              ⚠️ 作業Fは中間水準
+            </div>
+          </div>
+          <div style="border-left:4px solid var(--sky);padding:10px 14px;background:#EEF5FC;border-radius:0 8px 8px 0;">
+            <div style="font-size:12px;font-weight:700;color:var(--sky);margin-bottom:5px;">🔵 拠点B</div>
+            <div style="font-size:11px;color:var(--muted);line-height:1.7;">
+              ✅ 作業F・作業Gが最短<br>
+              ✅ 作業Jが高効率<br>
+              ⚠️ 作業Cはやや遅め
+            </div>
+          </div>
+          <div style="border-left:4px solid var(--amber);padding:10px 14px;background:#FEF8EC;border-radius:0 8px 8px 0;">
+            <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:5px;">🟠 拠点C</div>
+            <div style="font-size:11px;color:var(--muted);line-height:1.7;">
+              ✅ 分類C・分類Dに集中<br>
+              ⚠️ 全体的に標準時間が高め<br>
+              💡 拠点Aの手法を共有する余地あり
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 月次サマリーパネル -->
+  <div id="an-monthly" class="an-panel">
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">分類別 月次累計（サンプル）</div>
+        <table class="tbl">
+          <thead><tr><th>分類</th><th>1月</th><th>2月</th><th>3月</th><th>4月</th><th>累計</th></tr></thead>
+          <tbody>
+            <tr><td>分類A</td><td>480h</td><td>520h</td><td>488h</td><td>544h</td><td style="font-weight:700;color:var(--forest);">2,032h</td></tr>
+            <tr><td>分類B</td><td>320h</td><td>380h</td><td>340h</td><td>428h</td><td style="font-weight:700;">1,468h</td></tr>
+            <tr><td>分類C</td><td>80h</td><td>90h</td><td>148h</td><td>288h</td><td style="font-weight:700;">606h</td></tr>
+            <tr><td>分類D</td><td>0h</td><td>0h</td><td>182h</td><td>194h</td><td style="font-weight:700;">376h</td></tr>
+            <tr><td>分類E</td><td>120h</td><td>100h</td><td>88h</td><td>60h</td><td style="font-weight:700;">368h</td></tr>
+            <tr style="background:#F4FAF4;font-weight:700;"><td>合計</td><td>1,000h</td><td>1,090h</td><td>1,246h</td><td>1,514h</td><td style="color:var(--forest);font-size:14px;">4,850h</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">コスト概算（指数表示）</div>
+        <div class="bar-row"><div class="bar-lbl">分類A</div><div class="bar-track"><div class="bar-fill" style="width:88%;background:#4A8A50;">2,032pt</div></div></div>
+        <div class="bar-row"><div class="bar-lbl">分類B</div><div class="bar-track"><div class="bar-fill" style="width:64%;background:#7DC45F;">1,468pt</div></div></div>
+        <div class="bar-row"><div class="bar-lbl">分類C</div><div class="bar-track"><div class="bar-fill" style="width:26%;background:#C8820A;">606pt</div></div></div>
+        <div class="bar-row"><div class="bar-lbl">分類D</div><div class="bar-track"><div class="bar-fill" style="width:16%;background:#1F6090;">376pt</div></div></div>
+        <div class="bar-row"><div class="bar-lbl">分類E</div><div class="bar-track"><div class="bar-fill" style="width:16%;background:#B83A2A;">368pt</div></div></div>
+        <div style="margin-top:14px;padding:12px;background:var(--sand);border-radius:8px;font-size:12px;">
+          <strong>累計コスト指数：4,850pt</strong><br>
+          <span style="font-size:11px;color:var(--muted);">集計結果は速報値として確認できます</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- MODULE 3: 計画 -->
+<!-- ================================================================ -->
+<div id="mod-plan" class="module">
+  <div class="plan-tabs">
+    <div class="plan-tab active" onclick="switchPlanTab('weekly')">📆 週間予定</div>
+    <div class="plan-tab" onclick="switchPlanTab('daily')">📋 当日指示書</div>
+    <div class="plan-tab" onclick="switchPlanTab('shift')">👥 シフト管理</div>
+  </div>
+
+  <!-- 週間予定 -->
+  <div id="plan-weekly" class="plan-panel active">
+    <div class="week-nav">
+      <button class="week-btn">◀</button>
+      <div class="week-label">サンプル週 — チームA</div>
+      <button class="week-btn">▶</button>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--rust);"></div>完了（赤）</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--sky);"></div>進行中（青）</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--ink);"></div>未実施（黒）</div>
+      </div>
+      <select class="filter-select" style="margin-left:auto;">
+        <option>チームA</option><option>チームB</option>
+      </select>
+      <button class="btn-sm btn-primary">＋ 作業追加</button>
+    </div>
+
+    <table class="week-table">
+      <thead>
+        <tr>
+          <th style="width:120px;text-align:left;">対象 / 分類</th>
+          <th>月</th><th>火</th>
+          <th class="day-today">水 今日</th>
+          <th>木</th><th>金</th><th>土</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div class="row-label">区画A</div><div class="row-sub">分類B 約1,300単位</div></td>
+          <td><div class="task-cell">
+            <div class="task-chip done" onclick="toggleStatus(this)">作業A<br><span class="task-time">標準:24分 → 実績3.0h</span></div>
+          </div></td>
+          <td><div class="task-cell">
+            <div class="task-chip done" onclick="toggleStatus(this)">作業B<br><span class="task-time">標準:11分/千単位→0.8h</span></div>
+          </div></td>
+          <td><div class="task-cell">
+            <div class="task-chip wip" onclick="toggleStatus(this)">作業D<br><span class="task-time">標準:22分 → 推計2.6h</span></div>
+            <div class="add-task" onclick="addTask(this)">＋ 追加</div>
+          </div></td>
+          <td><div class="task-cell">
+            <div class="task-chip todo" onclick="toggleStatus(this)">作業E<br><span class="task-time">標準:15分/千単位→0.9h</span></div>
+          </div></td>
+          <td>—</td><td>—</td>
+        </tr>
+        <tr>
+          <td><div class="row-label">区画B</div><div class="row-sub">分類B 約1,200単位</div></td>
+          <td><div class="task-cell">
+            <div class="task-chip done" onclick="toggleStatus(this)">作業B<br><span class="task-time">標準:11分/千単位→0.8h</span></div>
+          </div></td>
+          <td>—</td>
+          <td><div class="task-cell">
+            <div class="task-chip todo" onclick="toggleStatus(this)">作業A<br><span class="task-time">標準:24分 → 推計2.8h</span></div>
+          </div></td>
+          <td><div class="task-cell">
+            <div class="task-chip todo" onclick="toggleStatus(this)">作業K<br><span class="task-time">標準:15分/千単位→0.9h</span></div>
+          </div></td>
+          <td>—</td><td>—</td>
+        </tr>
+        <tr>
+          <td><div class="row-label">区画C</div><div class="row-sub">分類A 約12,000単位</div></td>
+          <td><div class="task-cell">
+            <div class="task-chip done" onclick="toggleStatus(this)">作業C<br><span class="task-time">標準:8分/単位→実績2.8h</span></div>
+          </div></td>
+          <td><div class="task-cell">
+            <div class="task-chip done" onclick="toggleStatus(this)">作業L<br><span class="task-time">標準:45分→実績0.8h</span></div>
+          </div></td>
+          <td><div class="task-cell">
+            <div class="task-chip wip" onclick="toggleStatus(this)">作業M<br><span class="task-time">標準:20分→推計2.0h</span></div>
+          </div></td>
+          <td><div class="task-cell">
+            <div class="task-chip todo" onclick="toggleStatus(this)">作業F<br><span class="task-time">標準:180分→推計3.0h</span></div>
+          </div></td>
+          <td><div class="task-cell">
+            <div class="task-chip todo" onclick="toggleStatus(this)">作業C<br><span class="task-time">標準:8分/単位→推計2.8h</span></div>
+          </div></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><div class="row-label">区画D</div><div class="row-sub">分類B 約2,500単位</div></td>
+          <td>—</td>
+          <td><div class="task-cell">
+            <div class="task-chip done" onclick="toggleStatus(this)">作業N<br><span class="task-time">標準:22分→実績2.6h</span></div>
+          </div></td>
+          <td><div class="task-cell">
+            <div class="task-chip todo" onclick="toggleStatus(this)">作業A<br><span class="task-time">標準:24分→推計3.5h</span></div>
+          </div></td>
+          <td>—</td>
+          <td><div class="task-cell">
+            <div class="task-chip todo" onclick="toggleStatus(this)">作業D<br><span class="task-time">標準:22分→推計2.8h</span></div>
+          </div></td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:16px;padding:14px 18px;background:var(--white);border-radius:10px;border:1px solid var(--border);font-size:12px;display:flex;gap:24px;">
+      <div><strong>今週 推計作業時間：</strong> 32.5h（チームA合計）</div>
+      <div><strong>うち完了：</strong> <span style="color:var(--rust);font-weight:700;">14.2h</span></div>
+      <div><strong>進行中：</strong> <span style="color:var(--sky);font-weight:700;">5.6h</span></div>
+      <div><strong>未実施：</strong> <span style="font-weight:700;">12.7h</span></div>
+      <div><strong>必要工数：</strong> <span style="color:var(--leaf);font-weight:700;">残4.8人時相当</span></div>
+    </div>
+  </div>
+
+  <!-- 当日指示書 -->
+  <div id="plan-daily" class="plan-panel">
+    <div class="daily-header">
+      <div>
+        <div style="font-size:16px;font-weight:700;color:var(--forest);">当日指示書 — サンプル日 チームA</div>
+        <div class="daily-meta">責任者：責任者A　／　出勤：12名　／　総推計：28.5h</div>
+      </div>
+      <button class="print-btn" onclick="window.print()">🖨 印刷</button>
+    </div>
+
+    <div class="daily-grid">
+      <div class="daily-tasks">
+        <div style="display:grid;grid-template-columns:28px 90px 1fr 70px 70px 80px;gap:10px;padding:0 16px 8px;font-size:10px;color:var(--muted);font-weight:700;">
+          <div></div><div>場所</div><div>作業 / 担当者</div><div>数量</div><div>標準時間</div><div>状態</div>
+        </div>
+        <div class="daily-row wip">
+          <div class="dr-num">1</div>
+          <div><div class="dr-loc">区画A</div><div style="font-size:10px;color:var(--muted);">分類B</div></div>
+          <div><div class="dr-work">作業D</div><div class="dr-staff">スタッフA・スタッフB（2名）</div></div>
+          <div class="dr-time">約1,300単位</div>
+          <div class="dr-ave">2.6h<br><span style="font-size:9px;color:var(--muted);">標準22分</span></div>
+          <div><span class="dr-status st-wip">進行中</span></div>
+        </div>
+        <div class="daily-row todo">
+          <div class="dr-num">2</div>
+          <div><div class="dr-loc">区画B</div><div style="font-size:10px;color:var(--muted);">分類B</div></div>
+          <div><div class="dr-work">作業A</div><div class="dr-staff">スタッフC（1名）</div></div>
+          <div class="dr-time">約1,200単位</div>
+          <div class="dr-ave">2.8h<br><span style="font-size:9px;color:var(--muted);">標準24分</span></div>
+          <div><span class="dr-status st-todo">未実施</span></div>
+        </div>
+        <div class="daily-row wip">
+          <div class="dr-num">3</div>
+          <div><div class="dr-loc">区画C</div><div style="font-size:10px;color:var(--muted);">分類A</div></div>
+          <div><div class="dr-work">作業M</div><div class="dr-staff">スタッフD・スタッフE（2名）</div></div>
+          <div class="dr-time">約12,000単位</div>
+          <div class="dr-ave">2.0h<br><span style="font-size:9px;color:var(--muted);">標準20分</span></div>
+          <div><span class="dr-status st-wip">進行中</span></div>
+        </div>
+        <div class="daily-row todo">
+          <div class="dr-num">4</div>
+          <div><div class="dr-loc">区画D</div><div style="font-size:10px;color:var(--muted);">分類B</div></div>
+          <div><div class="dr-work">作業A</div><div class="dr-staff">スタッフF・スタッフG（2名）</div></div>
+          <div class="dr-time">約2,500単位</div>
+          <div class="dr-ave">3.5h<br><span style="font-size:9px;color:var(--muted);">標準24分</span></div>
+          <div><span class="dr-status st-todo">未実施</span></div>
+        </div>
+        <div class="daily-row done">
+          <div class="dr-num">5</div>
+          <div><div class="dr-loc">共用エリア</div><div style="font-size:10px;color:var(--muted);">—</div></div>
+          <div><div class="dr-work">作業F</div><div class="dr-staff">スタッフH・スタッフI（2名）</div></div>
+          <div class="dr-time">—</div>
+          <div class="dr-ave">3.0h<br><span style="font-size:9px;color:var(--muted);">標準180分</span></div>
+          <div><span class="dr-status st-done">完了</span></div>
+        </div>
+      </div>
+      <div class="daily-summary">
+        <div class="summary-card">
+          <div class="sc-title">本日サマリー</div>
+          <div class="sc-row"><div class="sc-key">総推計時間</div><div class="sc-val">28.5h</div></div>
+          <div class="sc-row"><div class="sc-key">出勤人数</div><div class="sc-val">12名</div></div>
+          <div class="sc-row"><div class="sc-key">1人あたり作業</div><div class="sc-val">2.4h/人</div></div>
+          <div class="sc-row"><div class="sc-key">コスト指数</div><div class="sc-val">14.4pt</div></div>
+        </div>
+        <div class="summary-card">
+          <div class="sc-title">進捗</div>
+          <div class="sc-row"><div class="sc-key" style="color:var(--rust);">■ 完了</div><div class="sc-val">3.0h</div></div>
+          <div class="sc-row"><div class="sc-key" style="color:var(--sky);">■ 進行中</div><div class="sc-val">4.6h</div></div>
+          <div class="sc-row"><div class="sc-key">■ 未実施</div><div class="sc-val">20.9h</div></div>
+        </div>
+        <div style="padding:12px 14px;background:var(--sand);border-radius:10px;font-size:11px;color:var(--muted);line-height:1.7;">
+          💡 <strong>標準時間は過去実績から自動参照</strong><br>
+          件数が増えるほど精度UP
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- シフト管理 -->
+  <div id="plan-shift" class="plan-panel">
+    <div class="shift-header">
+      <div>
+        <div class="shift-period">サンプル週シフト</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px;">拠点A チームA ＋ チームB</div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-sm btn-outline">← 前週</button>
+        <button class="btn-sm btn-outline">次週 →</button>
+        <button class="btn-sm btn-primary">＋ スタッフ追加</button>
+        <button class="btn-sm btn-amber">🖨 印刷</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <table class="shift-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;width:100px;">スタッフ</th>
+            <th style="text-align:left;width:80px;">チーム</th>
+            <th>月</th><th>火</th>
+            <th style="background:rgba(255,255,255,.2);">水</th>
+            <th>木</th><th>金</th><th>土</th><th>日</th>
+            <th>週計</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:700;">スタッフB</td>
+            <td><span class="team-badge team-a">チームA</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-on" style="border:2px solid var(--moss);">10h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-half">4h</span></td>
+            <td><span class="shift-cell shift-off">休</span></td>
+            <td class="shift-total">46h</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;">スタッフA</td>
+            <td><span class="team-badge team-a">チームA</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-on" style="border:2px solid var(--moss);">8h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-half">4h</span></td>
+            <td><span class="shift-cell shift-off">休</span></td>
+            <td><span class="shift-cell shift-off">休</span></td>
+            <td class="shift-total">36h</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;">スタッフC</td>
+            <td><span class="team-badge team-a">チームA</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-off">休</span></td>
+            <td><span class="shift-cell shift-on" style="border:2px solid var(--moss);">8h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-off">休</span></td>
+            <td class="shift-total">40h</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;">スタッフD</td>
+            <td><span class="team-badge team-a">チームA</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-on" style="border:2px solid var(--moss);">8h</span></td>
+            <td><span class="shift-cell shift-half">4h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-off">休</span></td>
+            <td class="shift-total">44h</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;">スタッフE</td>
+            <td><span class="team-badge team-a">チームA</span></td>
+            <td><span class="shift-cell shift-off">休</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-on" style="border:2px solid var(--moss);">8h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-half">4h</span></td>
+            <td><span class="shift-cell shift-off">休</span></td>
+            <td class="shift-total">36h</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;">スタッフF</td>
+            <td><span class="team-badge team-b">チームB</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-on" style="border:2px solid var(--moss);">8h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-off">休</span></td>
+            <td><span class="shift-cell shift-off">休</span></td>
+            <td class="shift-total">40h</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;">スタッフG</td>
+            <td><span class="team-badge team-b">チームB</span></td>
+            <td><span class="shift-cell shift-half">4h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-on" style="border:2px solid var(--moss);">8h</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-off">休</span></td>
+            <td><span class="shift-cell shift-on">8h</span></td>
+            <td><span class="shift-cell shift-off">休</span></td>
+            <td class="shift-total">36h</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr style="background:#F4FAF4;">
+            <td colspan="2" style="font-weight:700;padding:9px 10px;font-size:11px;color:var(--forest);">日別 稼働人数</td>
+            <td style="text-align:center;font-weight:700;">6名</td>
+            <td style="text-align:center;font-weight:700;">6名</td>
+            <td style="text-align:center;font-weight:700;color:var(--moss);">7名</td>
+            <td style="text-align:center;font-weight:700;">7名</td>
+            <td style="text-align:center;font-weight:700;">6名</td>
+            <td style="text-align:center;font-weight:700;">4名</td>
+            <td style="text-align:center;color:var(--muted);">0名</td>
+            <td style="font-weight:700;color:var(--forest);">278h</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- アーカイブ -->
+    <div style="margin-top:20px;">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;">📂 過去シフトアーカイブ</div>
+      <div class="archive-row">
+        <div class="archive-item current">当月 第1週</div>
+        <div class="archive-item">前月 第4週</div>
+        <div class="archive-item">前月 第3週</div>
+        <div class="archive-item">前月 第2週</div>
+        <div class="archive-item">前月 第1週</div>
+        <div class="archive-item">前々月 第4週</div>
+        <div class="archive-item">前々月 第3週</div>
+        <div class="archive-item">前年同月 第1週</div>
+        <div class="archive-item">前年前月 第4週</div>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);">💡 アーカイブを選ぶと昨年同時期のシフトをそのままコピーして新しいシフトの叩き台に使えます</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 時計
+function updateClock(){
+  const d = new Date();
+  const str = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')
+    +' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  document.getElementById('clock').textContent = 'デモデータ — 拠点A・拠点B・拠点C';
+}
+updateClock(); setInterval(updateClock,60000);
+
+// モジュール切替
+function switchModule(id){
+  document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
+  document.querySelectorAll('.mod-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('mod-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// 分析タブ切替
+function switchAnTab(id){
+  document.querySelectorAll('.an-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.an-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('an-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// 計画タブ切替
+function switchPlanTab(id){
+  document.querySelectorAll('.plan-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.plan-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('plan-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// 週間予定のタスク状態切替（クリックで todo→wip→done→todo）
+function toggleStatus(el){
+  if(el.classList.contains('todo')){
+    el.classList.remove('todo'); el.classList.add('wip');
+  } else if(el.classList.contains('wip')){
+    el.classList.remove('wip'); el.classList.add('done');
+  } else {
+    el.classList.remove('done'); el.classList.add('todo');
+  }
+}
+
+// タスク追加
+function addTask(el){
+  const cell = el.parentElement;
+  const chip = document.createElement('div');
+  chip.className='task-chip todo';
+  chip.innerHTML='新しい作業<br><span class="task-time">標準:—</span>';
+  chip.onclick=function(){toggleStatus(this);};
+  cell.insertBefore(chip, el);
+}
+</script>
+</body>
+</html>

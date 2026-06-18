@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理システム — Sample</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+<style>
+/* ── Reset & Base ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Noto Sans JP',system-ui,-apple-system,sans-serif;background:#F0F5FA;color:#334155}
+
+/* ── Design Tokens ── */
+:root{
+  --bg:#F0F5FA;--bg2:#E6EEF8;
+  --fg:#334155;--fg2:#475569;--muted:#94A3B8;
+  --primary:#1d4ed8;--destructive:#D4183D;
+  --surface-glass:rgba(255,255,255,0.65);--surface-glass-strong:rgba(255,255,255,0.85);
+  --surface-elevated:#FFFFFF;--border:rgba(255,255,255,0.5);
+  --border-solid:#E2E4E9;--input:#E2E8F0;
+  --shadow-low:0 2px 6px rgba(100,116,139,0.12);
+  --shadow-med:0 6px 12px rgba(100,116,139,0.18);
+  --radius-sm:10px;--radius:16px;--radius-lg:24px;--radius-pill:9999px;
+  --sidebar-w:200px;--sidebar-collapsed:52px;--header-h:56px;
+  --accent-admin:#D4183D;
+  --cyan1:#ECFEFF;--cyan2:#EFF6FF;
+  --green1:#BBF7D0;--green2:#34D399;
+}
+
+/* ── Layout ── */
+.app{display:flex;flex-direction:column;height:100vh;background:linear-gradient(135deg,var(--bg),var(--bg2))}
+
+/* ── Header ── */
+.header{
+  height:var(--header-h);display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+  background:var(--surface-glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  box-shadow:var(--shadow-low);z-index:100;flex-shrink:0;
+}
+.header-left{display:flex;align-items:center;gap:12px}
+.header-logo{
+  width:36px;height:36px;border-radius:var(--radius-pill);
+  background:linear-gradient(135deg,rgba(255,255,255,0.4),rgba(255,255,255,0.1));
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow-low);
+}
+.header-logo .material-icons-outlined{font-size:20px;color:var(--primary)}
+.header-title{font-size:15px;font-weight:700;color:var(--fg)}
+.header-subtitle{font-size:11px;color:var(--muted);margin-left:8px}
+.header-right{display:flex;align-items:center;gap:16px}
+.header-user{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--fg2)}
+.header-avatar{
+  width:32px;height:32px;border-radius:var(--radius-pill);
+  background:linear-gradient(135deg,#93c5fd,#1d4ed8);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:14px;font-weight:700;
+}
+.header-bell{position:relative;cursor:pointer}
+.header-bell .material-icons-outlined{font-size:22px;color:var(--fg2)}
+.header-bell-dot{
+  position:absolute;top:-2px;right:-2px;width:8px;height:8px;
+  background:var(--destructive);border-radius:50%;border:2px solid #fff;
+}
+.role-badge{
+  font-size:10px;font-weight:700;color:#fff;
+  background:var(--accent-admin);padding:2px 8px;border-radius:var(--radius-pill);
+}
+
+/* ── Body (sidebar + main) ── */
+.body{display:flex;flex:1;overflow:hidden}
+
+/* ── Sidebar ── */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:#F3F4F6;border-right:1px solid var(--border-solid);
+  display:flex;flex-direction:column;overflow-y:auto;
+  transition:width 200ms ease;padding:8px 6px;
+}
+.sidebar.collapsed{width:var(--sidebar-collapsed)}
+.sidebar.collapsed .nav-label,.sidebar.collapsed .nav-menu-arrow,.sidebar.collapsed .nav-children{display:none}
+.sidebar.collapsed .nav-item{justify-content:center;padding:6px 0}
+.sidebar.collapsed .nav-menu-header{justify-content:center;padding:6px 0}
+
+.nav-section{margin-bottom:4px}
+.nav-section-title{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding:8px 10px 4px}
+
+.nav-item,.nav-menu-header{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 10px;border-radius:var(--radius-sm);
+  cursor:pointer;font-size:12px;color:var(--fg);
+  transition:all 180ms ease;user-select:none;
+}
+.nav-item:hover,.nav-menu-header:hover{background:#E9ECF1}
+.nav-item.active{
+  background:#fff;font-weight:700;
+  box-shadow:0 10px 22px rgba(0,0,0,0.16),0 2px 6px rgba(0,0,0,0.1);
+  color:var(--accent-admin);
+}
+.nav-item.active .material-icons-outlined{color:var(--accent-admin)}
+.nav-item .material-icons-outlined,.nav-menu-header .material-icons-outlined{font-size:18px;color:var(--fg2)}
+.nav-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-menu-arrow{margin-left:auto;font-size:14px!important;color:var(--muted);transition:transform 200ms}
+.nav-menu.open .nav-menu-arrow{transform:rotate(180deg)}
+.nav-children{padding-left:18px;overflow:hidden;max-height:0;transition:max-height 250ms ease}
+.nav-menu.open .nav-children{max-height:300px}
+
+.sidebar-toggle{
+  margin-top:auto;padding:8px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--muted);border-radius:var(--radius-sm);
+}
+.sidebar-toggle:hover{background:#E9ECF1}
+
+/* ── Main Content ── */
+.main{flex:1;overflow:auto;display:flex;flex-direction:column}
+.main-bg{
+  flex:1;padding:16px 20px;
+  background:linear-gradient(135deg,var(--cyan1),var(--cyan2));
+  min-height:0;display:flex;flex-direction:column;
+}
+
+/* ── Page Header ── */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-shrink:0}
+.page-title-area{display:flex;align-items:center;gap:10px}
+.page-icon{
+  width:36px;height:36px;border-radius:12px;
+  background:linear-gradient(135deg,var(--green1),var(--green2));
+  display:flex;align-items:center;justify-content:center;
+}
+.page-icon .material-icons-outlined{font-size:20px;color:#fff}
+.page-title{font-size:18px;font-weight:700;color:var(--fg)}
+.page-count{font-size:12px;color:var(--muted);margin-left:4px}
+
+/* ── Filter Bar ── */
+.filter-bar{
+  display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-shrink:0;flex-wrap:wrap;
+}
+.search-box{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.6);
+  backdrop-filter:blur(12px) saturate(160%);-webkit-backdrop-filter:blur(12px) saturate(160%);
+  border-radius:20px;padding:8px 14px;min-width:240px;
+}
+.search-box input{border:none;outline:none;font-size:12px;font-family:inherit;background:transparent;flex:1;color:var(--fg)}
+.search-box .material-icons-outlined{font-size:18px;color:var(--muted)}
+.filter-select{
+  font-size:12px;font-family:inherit;padding:8px 28px 8px 12px;
+  border:1px solid rgba(255,255,255,0.6);border-radius:20px;
+  background:rgba(255,255,255,0.6);color:var(--fg);cursor:pointer;
+  backdrop-filter:blur(12px) saturate(160%);-webkit-backdrop-filter:blur(12px) saturate(160%);
+  appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%2394A3B8' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;
+}
+.btn-create{
+  display:flex;align-items:center;gap:4px;
+  padding:8px 18px;border-radius:var(--radius-pill);border:1px solid rgba(52,211,153,0.35);
+  background:rgba(187,247,208,0.4);color:var(--fg);font-size:12px;font-weight:500;
+  cursor:pointer;transition:all 180ms;font-family:inherit;
+  backdrop-filter:blur(12px) saturate(160%);-webkit-backdrop-filter:blur(12px) saturate(160%);
+}
+.btn-create:hover{background:rgba(187,247,208,0.7)}
+
+/* ── Data Grid ── */
+.grid-container{
+  flex:1;min-height:0;
+  background:transparent;
+  border-radius:var(--radius);overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.grid-table{width:100%;border-collapse:separate;border-spacing:0 8px;table-layout:fixed}
+.grid-thead{position:sticky;top:0;z-index:10}
+.grid-thead th{
+  background:rgba(255,255,255,0.45);backdrop-filter:blur(12px) saturate(160%);-webkit-backdrop-filter:blur(12px) saturate(160%);
+  padding:10px 14px;font-size:10px;font-weight:700;color:var(--muted);
+  text-align:left;border-bottom:none;
+  white-space:nowrap;
+}
+.grid-thead th:first-child{border-radius:20px 0 0 20px}
+.grid-thead th:last-child{border-radius:0 20px 20px 0}
+.grid-tbody tr{
+  cursor:pointer;transition:all 180ms ease;
+  background:rgba(255,255,255,0.55);
+  backdrop-filter:blur(12px) saturate(160%);-webkit-backdrop-filter:blur(12px) saturate(160%);
+  box-shadow:0 2px 8px rgba(100,116,139,0.10);
+  border-radius:20px;
+}
+.grid-tbody tr:hover{background:rgba(255,255,255,0.75);box-shadow:0 4px 16px rgba(100,116,139,0.16)}
+.grid-tbody tr.selected{background:rgba(29,78,216,0.12);box-shadow:0 0 0 2px rgba(29,78,216,0.35)}
+.grid-tbody td{
+  padding:12px 14px;font-size:11px;color:var(--fg);vertical-align:middle;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  border-top:1px solid rgba(255,255,255,0.6);border-bottom:1px solid rgba(255,255,255,0.6);
+}
+.grid-tbody td:first-child{border-left:1px solid rgba(255,255,255,0.6);border-radius:20px 0 0 20px}
+.grid-tbody td:last-child{border-right:1px solid rgba(255,255,255,0.6);border-radius:0 20px 20px 0}
+
+/* ── Name Cell ── */
+.name-cell{display:flex;align-items:center;gap:10px}
+.name-avatar{
+  width:34px;height:34px;border-radius:12px;flex-shrink:0;
+  background:#F1F5F9;display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.name-avatar .material-icons-outlined{font-size:20px;color:#CBD5E1}
+.name-ja{font-size:12px;font-weight:700;color:var(--fg)}
+.name-en{font-size:9px;color:var(--muted)}
+
+/* ── Category Cell ── */
+.cat-cell{display:flex;align-items:center;gap:4px}
+.cat-icon{font-size:14px}
+.cat-code{font-size:9px;font-weight:700;color:var(--fg2)}
+
+/* ── Gender Icon ── */
+.gender-icon{font-size:16px}
+.gender-male{color:#2563EB}
+.gender-female{color:#DB2777}
+
+/* ── Status Badges ── */
+.badge{
+  display:inline-block;font-size:10px;font-weight:600;color:#fff;
+  padding:3px 10px;border-radius:20px;white-space:nowrap;
+}
+.badge-success{background:#22C55E}
+.badge-info{background:#60A5FA}
+.badge-warning{background:#F59E0B}
+.badge-danger{background:#EF4444}
+.badge-neutral{background:#9CA3AF}
+
+/* ── Pagination ── */
+.pagination{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;margin-top:4px;
+  background:rgba(255,255,255,0.45);backdrop-filter:blur(12px) saturate(160%);-webkit-backdrop-filter:blur(12px) saturate(160%);
+  border-radius:20px;
+  font-size:11px;color:var(--muted);flex-shrink:0;
+}
+.pagination-btns{display:flex;gap:4px}
+.pagination-btns button{
+  padding:4px 10px;border:1px solid var(--input);border-radius:6px;
+  background:var(--surface-elevated);font-size:11px;cursor:pointer;font-family:inherit;
+  color:var(--fg2);transition:all 120ms;
+}
+.pagination-btns button:hover{background:#E9ECF1}
+.pagination-btns button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+/* ── Detail Overlay (no backdrop, grid stays interactive) ── */
+.detail-overlay{
+  position:fixed;top:var(--header-h);left:0;right:0;bottom:0;z-index:300;
+  pointer-events:none;overflow:hidden;
+}
+.detail-panel{
+  position:absolute;top:0;right:0;bottom:0;width:40vw;max-width:100%;
+  background:rgba(255,255,255,0.75);overflow-y:auto;
+  backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
+  box-shadow:-8px 0 32px rgba(100,116,139,0.18);
+  border-left:1px solid rgba(0,0,0,0.08);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform 300ms cubic-bezier(0.4,0,0.2,1);
+  pointer-events:auto;
+}
+.detail-overlay.open .detail-panel{transform:translateX(0)}
+.detail-panel-header{
+  padding:12px 16px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,0.5);
+  background:rgba(255,255,255,0.5);
+  backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);
+  flex-shrink:0;gap:8px;
+}
+.detail-panel-header h3{font-size:14px;font-weight:700;color:var(--fg);flex:1;margin:0 8px}
+.panel-actions{display:flex;align-items:center;gap:6px}
+.panel-action-btn{
+  width:32px;height:32px;border-radius:var(--radius-sm);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;border:1px solid;transition:all 150ms;
+  background:none;font-size:0;
+}
+.panel-action-btn .material-icons-outlined{font-size:18px}
+.panel-action-btn.tone-mono{
+  color:var(--fg);border-color:rgba(51,65,85,0.25);background:rgba(51,65,85,0.08);
+}
+.panel-action-btn.tone-mono:hover{background:rgba(51,65,85,0.16)}
+.panel-action-btn.tone-primary{
+  color:var(--primary);border-color:rgba(29,78,216,0.45);background:rgba(29,78,216,0.18);
+}
+.panel-action-btn.tone-primary:hover{background:rgba(29,78,216,0.28)}
+.panel-action-btn.tone-primary.active{background:rgba(29,78,216,0.26);border-color:rgba(29,78,216,0.6)}
+.panel-action-btn.tone-mint{
+  color:#34D399;border-color:rgba(52,211,153,0.45);background:rgba(52,211,153,0.18);
+}
+.panel-action-btn.tone-mint:hover{background:rgba(52,211,153,0.28)}
+.panel-action-btn.tone-danger{
+  color:var(--destructive);border-color:rgba(212,24,61,0.45);background:rgba(212,24,61,0.18);
+}
+.panel-action-btn.tone-danger:hover{background:rgba(212,24,61,0.28)}
+.detail-header-badges{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.detail-body{padding:20px;flex:1}
+.detail-section{margin-bottom:16px}
+.detail-section-title{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
+.detail-row{display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid rgba(226,228,233,0.3)}
+.detail-label{color:var(--muted)}
+.detail-value{color:var(--fg);font-weight:500;text-align:right}
+.detail-avatar-area{
+  display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:20px;
+}
+.detail-avatar-lg{
+  width:80px;height:80px;border-radius:var(--radius-pill);
+  background:#E2E8F0;display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow-low);
+}
+.detail-avatar-lg .material-icons-outlined{font-size:44px;color:#CBD5E1}
+.detail-name-lg{font-size:16px;font-weight:700;text-align:center}
+.detail-name-sub{font-size:12px;color:var(--muted);text-align:center}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.3);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(148,163,184,0.5)}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .detail-panel{position:fixed;right:0;top:var(--header-h);bottom:0;width:100%;z-index:200}
+  .filter-bar{flex-direction:column;align-items:stretch}
+  .search-box{min-width:auto}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ══ HEADER ══ -->
+  <header class="header">
+    <div class="header-left">
+      <div class="header-logo"><span class="material-icons-outlined">dashboard</span></div>
+      <span class="header-title">管理システム</span>
+      <span class="header-subtitle">Sample</span>
+      <a href="../../" style="margin-left:16px;font-size:11px;color:#1d4ed8;text-decoration:none;font-weight:600;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">← Back to Top</a>
+    </div>
+    <div class="header-right">
+      <div class="header-bell">
+        <span class="material-icons-outlined">notifications_none</span>
+        <div class="header-bell-dot"></div>
+      </div>
+      <span class="role-badge">管理者</span>
+      <div class="header-user">
+        <div class="header-avatar">D</div>
+        <span>Sample Admin</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="body">
+
+    <!-- ══ SIDEBAR ══ -->
+    <nav class="sidebar" id="sidebar">
+
+      <!-- Dashboard -->
+      <div class="nav-item active" data-page="dashboard" onclick="navTo(this)">
+        <span class="material-icons-outlined">home</span>
+        <span class="nav-label">ダッシュボード</span>
+      </div>
+
+      <!-- ワークフロー -->
+      <div class="nav-item" data-page="workflow" onclick="navTo(this)">
+        <span class="material-icons-outlined">account_tree</span>
+        <span class="nav-label">ワークフロー</span>
+      </div>
+
+      <!-- 一覧 -->
+      <div class="nav-section-title">データ</div>
+      <div class="nav-menu open" id="menu-ledger">
+        <div class="nav-menu-header" onclick="toggleMenu('menu-ledger')">
+          <span class="material-icons-outlined">menu_book</span>
+          <span class="nav-label">一覧</span>
+          <span class="material-icons-outlined nav-menu-arrow">expand_more</span>
+        </div>
+        <div class="nav-children">
+          <div class="nav-item" data-page="ledger" onclick="navTo(this)">
+            <span class="material-icons-outlined">badge</span>
+            <span class="nav-label">📒 一覧</span>
+          </div>
+          <div class="nav-item" data-page="schedule" onclick="navTo(this)">
+            <span class="material-icons-outlined">event</span>
+            <span class="nav-label">スケジュール</span>
+          </div>
+          <div class="nav-item" data-page="candidates" onclick="navTo(this)">
+            <span class="material-icons-outlined">groups</span>
+            <span class="nav-label">候補者</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- タスク -->
+      <div class="nav-menu" id="menu-tasks">
+        <div class="nav-menu-header" onclick="toggleMenu('menu-tasks')">
+          <span class="material-icons-outlined">task_alt</span>
+          <span class="nav-label">タスク</span>
+          <span class="material-icons-outlined nav-menu-arrow">expand_more</span>
+        </div>
+        <div class="nav-children">
+          <div class="nav-item" data-page="requests" onclick="navTo(this)">
+            <span class="material-icons-outlined">description</span>
+            <span class="nav-label">申請一覧</span>
+          </div>
+          <div class="nav-item" data-page="calendar" onclick="navTo(this)">
+            <span class="material-icons-outlined">schedule</span>
+            <span class="nav-label">カレンダー</span>
+          </div>
+          <div class="nav-item" data-page="templates" onclick="navTo(this)">
+            <span class="material-icons-outlined">assignment</span>
+            <span class="nav-label">テンプレート</span>
+          </div>
+          <div class="nav-item" data-page="progress" onclick="navTo(this)">
+            <span class="material-icons-outlined">how_to_reg</span>
+            <span class="nav-label">進捗管理</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 設定 -->
+      <div class="nav-menu" id="menu-settings">
+        <div class="nav-menu-header" onclick="toggleMenu('menu-settings')">
+          <span class="material-icons-outlined">tune</span>
+          <span class="nav-label">設定</span>
+          <span class="material-icons-outlined nav-menu-arrow">expand_more</span>
+        </div>
+        <div class="nav-children">
+          <div class="nav-item" data-page="org" onclick="navTo(this)">
+            <span class="material-icons-outlined">business</span>
+            <span class="nav-label">組織</span>
+          </div>
+          <div class="nav-item" data-page="partners" onclick="navTo(this)">
+            <span class="material-icons-outlined">public</span>
+            <span class="nav-label">パートナー</span>
+          </div>
+          <div class="nav-item" data-page="teams" onclick="navTo(this)">
+            <span class="material-icons-outlined">group</span>
+            <span class="nav-label">チーム</span>
+          </div>
+          <div class="nav-item" data-page="users" onclick="navTo(this)">
+            <span class="material-icons-outlined">manage_accounts</span>
+            <span class="nav-label">ユーザー</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toggle -->
+      <div class="sidebar-toggle" onclick="toggleSidebar()">
+        <span class="material-icons-outlined" id="sidebar-toggle-icon">chevron_left</span>
+      </div>
+    </nav>
+
+    <!-- ══ MAIN CONTENT ══ -->
+    <div class="main">
+      <div class="main-bg">
+
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="page-title-area">
+            <div class="page-icon"><span class="material-icons-outlined">badge</span></div>
+            <h1 class="page-title">📒 一覧</h1>
+            <span class="page-count" id="totalCount">（12件）</span>
+          </div>
+          <button class="btn-create" onclick="alert('サンプル画面：新規作成は無効です')">
+            <span class="material-icons-outlined" style="font-size:16px">add</span>
+            新規登録
+          </button>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div class="search-box">
+            <span class="material-icons-outlined">search</span>
+            <input type="text" placeholder="名前・組織名で検索..." id="searchInput" oninput="filterRows()">
+          </div>
+          <select class="filter-select" id="filterCategory" onchange="filterRows()">
+            <option value="">カテゴリ（すべて）</option>
+            <option value="A">カテゴリ A</option>
+            <option value="B">カテゴリ B</option>
+            <option value="C">カテゴリ C</option>
+            <option value="D">カテゴリ D</option>
+            <option value="E">カテゴリ E</option>
+          </select>
+          <select class="filter-select" id="filterCheck" onchange="filterRows()">
+            <option value="">確認状況（すべて）</option>
+            <option value="pending">未確認</option>
+            <option value="primary_checked">一次確認済み</option>
+            <option value="final_checked">最終確認済み</option>
+            <option value="rejected">差戻し</option>
+          </select>
+          <select class="filter-select" id="filterStatus" onchange="filterRows()">
+            <option value="">ステータス（すべて）</option>
+            <option value="completed">完了</option>
+            <option value="approved">承認済み</option>
+            <option value="in_review">レビュー中</option>
+            <option value="processing">処理中</option>
+            <option value="draft">下書き</option>
+          </select>
+        </div>
+
+        <!-- Grid -->
+        <div class="grid-container" style="flex:1;display:flex;flex-direction:column">
+          <div style="flex:1;overflow:auto">
+            <table class="grid-table">
+              <thead class="grid-thead">
+                <tr>
+                  <th style="width:180px">氏名</th>
+                  <th style="width:80px">カテゴリ</th>
+                  <th style="width:40px">性別</th>
+                  <th style="width:130px">所属</th>
+                  <th style="width:90px">担当</th>
+                  <th style="width:85px">確認状況</th>
+                  <th style="width:85px">ステータス</th>
+                  <th style="width:80px">期限</th>
+                  <th style="width:70px">更新日</th>
+                </tr>
+              </thead>
+              <tbody class="grid-tbody" id="gridBody"></tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <span id="pageInfo">1〜12 / 12件</span>
+            <div class="pagination-btns">
+              <button class="active">1</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DETAIL OVERLAY ══ -->
+<div class="detail-overlay" id="detailOverlay">
+  <div class="detail-panel">
+    <div class="detail-panel-header">
+      <div class="panel-actions">
+        <button class="panel-action-btn tone-mono" onclick="closeDetail()" title="閉じる">
+          <span class="material-icons-outlined">close</span>
+        </button>
+        <button class="panel-action-btn tone-primary" id="expandBtn" onclick="toggleExpand()" title="拡大">
+          <span class="material-icons-outlined" id="expandIcon">fullscreen</span>
+        </button>
+        <button class="panel-action-btn tone-mint" onclick="alert('サンプル画面：保存は無効です')" title="編集">
+          <span class="material-icons-outlined">edit</span>
+        </button>
+        <button class="panel-action-btn tone-danger" onclick="alert('サンプル画面：削除は無効です')" title="削除">
+          <span class="material-icons-outlined">delete</span>
+        </button>
+      </div>
+      <h3 id="detailTitle">詳細</h3>
+      <div class="detail-header-badges" id="detailHeaderBadges"></div>
+    </div>
+    <div class="detail-body" id="detailBody"></div>
+  </div>
+</div>
+
+<script>
+// ── Mock Data ──
+const CATEGORY_ICONS = {A:'🔵',B:'🟢',C:'🟠',D:'🟣',E:'🔴'};
+const CATEGORY_LABELS = {A:'カテゴリ A',B:'カテゴリ B',C:'カテゴリ C',D:'カテゴリ D',E:'カテゴリ E'};
+const CHECK_LABELS = {pending:'未確認',primary_checked:'一次確認済み',final_checked:'最終確認済み',rejected:'差戻し'};
+const CHECK_TONES = {pending:'warning',primary_checked:'info',final_checked:'success',rejected:'danger'};
+const STATUS_LABELS = {draft:'下書き',processing:'処理中',in_review:'レビュー中',approved:'承認済み',completed:'完了'};
+const STATUS_TONES = {draft:'info',processing:'info',in_review:'info',approved:'success',completed:'success'};
+const DEPT_LABELS = {general:'総務',sales:'営業',dev:'開発',support:'サポート',planning:'企画',hr:'人事'};
+const GENDER_LABELS = {male:'男性',female:'女性'};
+
+const STAFF = [
+  {id:1,nameJa:'登録者 A',nameEn:'User A',cat:'A',gender:'male',org:'組織アルファ',dept:'sales',check:'final_checked',status:'completed',deadline:'2027-05-12',updated:'2026-03-20',birth:'1998-05-12',phone:'000-0000-0001',email:'user.a@example.invalid',level:'レベル3',salary:'月額22万'},
+  {id:2,nameJa:'登録者 B',nameEn:'User B',cat:'A',gender:'female',org:'組織ベータ',dept:'general',check:'primary_checked',status:'completed',deadline:'2027-08-22',updated:'2026-03-19',birth:'2000-08-22',phone:'000-0000-0002',email:'user.b@example.invalid',level:'レベル4',salary:'月額20万'},
+  {id:3,nameJa:'登録者 C',nameEn:'User C',cat:'B',gender:'female',org:'組織ガンマ',dept:'support',check:'final_checked',status:'completed',deadline:'2027-03-15',updated:'2026-03-18',birth:'1999-03-15',phone:'000-0000-0003',email:'user.c@example.invalid',level:'レベル3',salary:'月額21万'},
+  {id:4,nameJa:'登録者 D',nameEn:'User D',cat:'C',gender:'male',org:'組織デルタ',dept:'dev',check:'pending',status:'in_review',deadline:null,updated:'2026-03-17',birth:'1997-11-03',phone:'000-0000-0004',email:'user.d@example.invalid',level:'レベル4',salary:'月額25万'},
+  {id:5,nameJa:'登録者 E',nameEn:'User E',cat:'D',gender:'male',org:'組織イプシロン',dept:'dev',check:'primary_checked',status:'approved',deadline:'2027-01-28',updated:'2026-03-16',birth:'2001-01-28',phone:'000-0000-0005',email:'user.e@example.invalid',level:'レベル3',salary:'月額23万'},
+  {id:6,nameJa:'登録者 F',nameEn:'User F',cat:'A',gender:'female',org:'組織アルファ',dept:'general',check:'pending',status:'draft',deadline:null,updated:'2026-03-15',birth:'2000-07-14',phone:'000-0000-0006',email:'user.f@example.invalid',level:'レベル5',salary:null},
+  {id:7,nameJa:'登録者 G',nameEn:'User G',cat:'B',gender:'male',org:'組織ガンマ',dept:'support',check:'rejected',status:'processing',deadline:null,updated:'2026-03-14',birth:'1998-12-05',phone:'000-0000-0007',email:'user.g@example.invalid',level:'レベル4',salary:'月額20万'},
+  {id:8,nameJa:'登録者 H',nameEn:'User H',cat:'A',gender:'male',org:'組織ベータ',dept:'general',check:'final_checked',status:'completed',deadline:'2026-04-30',updated:'2026-03-13',birth:'1996-09-18',phone:'000-0000-0008',email:'user.h@example.invalid',level:'レベル2',salary:'月額24万'},
+  {id:9,nameJa:'登録者 I',nameEn:'User I',cat:'C',gender:'male',org:'組織デルタ',dept:'dev',check:'primary_checked',status:'in_review',deadline:null,updated:'2026-03-12',birth:'1999-06-20',phone:'000-0000-0009',email:'user.i@example.invalid',level:'レベル4',salary:'月額25万'},
+  {id:10,nameJa:'登録者 J',nameEn:'User J',cat:'A',gender:'female',org:'組織アルファ',dept:'sales',check:'final_checked',status:'completed',deadline:'2027-09-10',updated:'2026-03-11',birth:'2001-04-08',phone:'000-0000-0010',email:'user.j@example.invalid',level:'レベル3',salary:'月額22万'},
+  {id:11,nameJa:'登録者 K',nameEn:'User K',cat:'B',gender:'male',org:'組織ガンマ',dept:'support',check:'pending',status:'processing',deadline:null,updated:'2026-03-10',birth:'2000-02-14',phone:'000-0000-0011',email:'user.k@example.invalid',level:'レベル4',salary:null},
+  {id:12,nameJa:'登録者 L',nameEn:'User L',cat:'D',gender:'male',org:'組織イプシロン',dept:'dev',check:'primary_checked',status:'completed',deadline:'2027-11-05',updated:'2026-03-09',birth:'1998-10-30',phone:'000-0000-0012',email:'user.l@example.invalid',level:'レベル3',salary:'月額23万'},
+];
+
+// ── Render Grid ──
+let filtered = [...STAFF];
+let selectedId = null;
+
+function renderGrid(data) {
+  const body = document.getElementById('gridBody');
+  body.innerHTML = data.map(s => `
+    <tr class="${s.id === selectedId ? 'selected' : ''}" onclick="selectRow(${s.id})">
+      <td>
+        <div class="name-cell">
+          <div class="name-avatar"><span class="material-icons-outlined">person</span></div>
+          <div><div class="name-ja">${s.nameJa}</div><div class="name-en">${s.nameEn}</div></div>
+        </div>
+      </td>
+      <td><div class="cat-cell"><span class="cat-icon">${CATEGORY_ICONS[s.cat]||''}</span><span class="cat-code">${CATEGORY_LABELS[s.cat]||s.cat}</span></div></td>
+      <td><span class="material-icons-outlined gender-icon ${s.gender==='male'?'gender-male':'gender-female'}">${s.gender==='male'?'face':'face_3'}</span></td>
+      <td style="font-size:10px">${s.org}</td>
+      <td style="font-size:10px">${DEPT_LABELS[s.dept]||s.dept}</td>
+      <td><span class="badge badge-${CHECK_TONES[s.check]||'neutral'}">${CHECK_LABELS[s.check]||s.check}</span></td>
+      <td><span class="badge badge-${STATUS_TONES[s.status]||'neutral'}">${STATUS_LABELS[s.status]||s.status}</span></td>
+      <td style="font-size:10px">${s.deadline||'—'}</td>
+      <td style="font-size:10px;color:var(--muted)">${s.updated}</td>
+    </tr>
+  `).join('');
+  document.getElementById('totalCount').textContent = `（${data.length}件）`;
+  document.getElementById('pageInfo').textContent = `1〜${data.length} / ${data.length}件`;
+}
+
+function filterRows() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const cat = document.getElementById('filterCategory').value;
+  const chk = document.getElementById('filterCheck').value;
+  const sts = document.getElementById('filterStatus').value;
+  filtered = STAFF.filter(s => {
+    if (q && !s.nameJa.toLowerCase().includes(q) && !s.nameEn.toLowerCase().includes(q) && !s.org.toLowerCase().includes(q)) return false;
+    if (cat && s.cat !== cat) return false;
+    if (chk && s.check !== chk) return false;
+    if (sts && s.status !== sts) return false;
+    return true;
+  });
+  renderGrid(filtered);
+}
+
+function selectRow(id) {
+  selectedId = id;
+  renderGrid(filtered);
+  showDetail(id);
+}
+
+function showDetail(id) {
+  const s = STAFF.find(x => x.id === id);
+  if (!s) return;
+  const overlay = document.getElementById('detailOverlay');
+  overlay.classList.add('open');
+  document.getElementById('detailTitle').textContent = s.nameJa;
+  document.getElementById('detailHeaderBadges').innerHTML =
+    `<span class="badge badge-${CHECK_TONES[s.check]}">${CHECK_LABELS[s.check]}</span>` +
+    `<span class="badge badge-${STATUS_TONES[s.status]}">${STATUS_LABELS[s.status]}</span>`;
+  const deadlineWarning = s.deadline && new Date(s.deadline) < new Date('2026-06-01')
+    ? `<div style="margin-top:8px;padding:8px 12px;background:rgba(254,226,226,0.6);border:1px solid rgba(252,165,165,0.4);border-radius:8px;font-size:11px;color:#991B1B">⚠ 期限まで残りわずかです</div>` : '';
+  document.getElementById('detailBody').innerHTML = `
+    <div class="detail-avatar-area">
+      <div class="detail-avatar-lg"><span class="material-icons-outlined">person</span></div>
+      <div class="detail-name-lg">${s.nameJa}</div>
+      <div class="detail-name-sub">${s.nameEn}</div>
+      <div style="display:flex;gap:6px;margin-top:4px">
+        <span class="badge badge-${CHECK_TONES[s.check]}">${CHECK_LABELS[s.check]}</span>
+        <span class="badge badge-${STATUS_TONES[s.status]}">${STATUS_LABELS[s.status]}</span>
+      </div>
+    </div>
+    ${deadlineWarning}
+    <div class="detail-section">
+      <div class="detail-section-title">基本情報</div>
+      <div class="detail-row"><span class="detail-label">カテゴリ</span><span class="detail-value">${CATEGORY_ICONS[s.cat]} ${CATEGORY_LABELS[s.cat]}</span></div>
+      <div class="detail-row"><span class="detail-label">性別</span><span class="detail-value">${GENDER_LABELS[s.gender]}</span></div>
+      <div class="detail-row"><span class="detail-label">生年月日</span><span class="detail-value">${s.birth}</span></div>
+      <div class="detail-row"><span class="detail-label">レベル</span><span class="detail-value">${s.level}</span></div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">所属情報</div>
+      <div class="detail-row"><span class="detail-label">所属</span><span class="detail-value">${s.org}</span></div>
+      <div class="detail-row"><span class="detail-label">担当</span><span class="detail-value">${DEPT_LABELS[s.dept]}</span></div>
+      <div class="detail-row"><span class="detail-label">報酬</span><span class="detail-value">${s.salary||'—'}</span></div>
+      <div class="detail-row"><span class="detail-label">期限</span><span class="detail-value">${s.deadline||'—'}</span></div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">連絡先</div>
+      <div class="detail-row"><span class="detail-label">電話</span><span class="detail-value">${s.phone}</span></div>
+      <div class="detail-row"><span class="detail-label">メール</span><span class="detail-value" style="font-size:11px">${s.email}</span></div>
+    </div>
+  `;
+}
+
+function closeDetail() {
+  document.getElementById('detailOverlay').classList.remove('open');
+  selectedId = null;
+  renderGrid(filtered);
+}
+
+// ── Sidebar ──
+function toggleMenu(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  sb.classList.toggle('collapsed');
+  document.getElementById('sidebar-toggle-icon').textContent = sb.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left';
+}
+
+function navTo(el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  if (el.dataset.page !== 'ledger') {
+    alert('サンプル画面：このページは「📒 一覧」のみ実装されています');
+  }
+}
+
+// ── Expand / Collapse panel ──
+let isExpanded = false;
+function toggleExpand() {
+  isExpanded = !isExpanded;
+  const panel = document.querySelector('.detail-panel');
+  panel.style.width = isExpanded ? '100vw' : '40vw';
+  document.getElementById('expandIcon').textContent = isExpanded ? 'fullscreen_exit' : 'fullscreen';
+  document.getElementById('expandBtn').classList.toggle('active', isExpanded);
+}
+
+// ── ESC to close overlay ──
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeDetail();
+});
+
+// ── Init ──
+renderGrid(STAFF);
+document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+document.querySelector('[data-page="ledger"]').classList.add('active');
+</script>
+</body>
+</html>

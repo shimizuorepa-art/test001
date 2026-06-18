@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<base target="_top">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>サンプル入力受付ポータル 入力フォーム</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap');
+* { box-sizing: border-box; }
+body {
+  font-family:'Zen Kaku Gothic New','Hiragino Sans','Yu Gothic',sans-serif;
+  margin:0; padding:0; background:#f5f7f8; color:#333;
+}
+.wrap { max-width:560px; margin:0 auto; padding:16px; }
+h1 { font-size:20px; margin:8px 0 16px; color:#1d4ed8; }
+h2 { font-size:16px; margin:20px 0 8px; color:#1d4ed8;
+     border-left:4px solid #1d4ed8; padding-left:8px; }
+.card { background:#fff; padding:16px; border-radius:12px;
+        box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:12px; }
+label { display:block; font-size:13px; margin:10px 0 4px; color:#555; font-weight:600; }
+input, select, textarea {
+  width:100%; padding:10px; font-size:15px;
+  border:1px solid #cfd8dc; border-radius:8px; background:#fff;
+  -webkit-appearance:none;
+}
+input:focus, select:focus, textarea:focus { outline:none; border-color:#1d4ed8; }
+input[readonly] { background:#f5f5f5; color:#666; }
+.row { display:flex; gap:8px; }
+.row > div { flex:1; }
+button {
+  width:100%; padding:14px; font-size:16px; font-weight:bold;
+  border:none; border-radius:10px; background:#1d4ed8; color:#fff;
+  cursor:pointer;
+}
+button:disabled { background:#9e9e9e; }
+.note { font-size:12px; color:#777; margin-top:4px; }
+.calc { background:#dbeafe; padding:12px; border-radius:8px;
+        font-size:14px; margin-top:8px; }
+.calc b { color:#1d4ed8; font-size:20px; }
+.err { color:#c62828; font-size:13px; margin-top:8px; }
+.ok { color:#1d4ed8; font-size:14px; margin-top:8px; font-weight:bold; }
+.info-banner { background:#fff3e0; padding:10px 12px; border-radius:8px;
+               font-size:12px; color:#e65100; margin-bottom:12px;
+               border-left:3px solid #ef6c00; }
+#loginBox { margin-top:40px; }
+.hidden { display:none; }
+
+:root {
+  --orchard-ink:#1a2332;
+  --orchard-muted:#5d6b82;
+  --orchard-deep:#1d4ed8;
+  --orchard-leaf:#3b82f6;
+  --orchard-fresh:#60a5fa;
+  --orchard-citrus:#f59e0b;
+  --orchard-cream:#f1f4f8;
+  --orchard-card:rgba(255,255,255,.88);
+  --orchard-line:rgba(29,78,216,.14);
+  --orchard-shadow:0 22px 60px rgba(29,78,216,.12);
+}
+html { min-height:100%; }
+body {
+  min-height:100vh;
+  font-family:'Zen Kaku Gothic New','Hiragino Sans','Yu Gothic',sans-serif;
+  color:var(--orchard-ink);
+  background:
+    radial-gradient(circle at 12% 10%, rgba(59,130,246,.12), transparent 28rem),
+    radial-gradient(circle at 88% 0%, rgba(29,78,216,.1), transparent 30rem),
+    linear-gradient(135deg, #f1f4f8 0%, #e8eef6 46%, #edf1f8 100%);
+}
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    linear-gradient(rgba(29,78,216,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29,78,216,.04) 1px, transparent 1px);
+  background-size:34px 34px;
+  mask-image:linear-gradient(to bottom, rgba(0,0,0,.72), transparent 78%);
+}
+.wrap {
+  position:relative;
+  z-index:1;
+  max-width:760px;
+  padding:clamp(18px,4vw,44px) 16px 56px;
+}
+.brand-hero {
+  position:relative;
+  overflow:hidden;
+  margin:6px 0 18px;
+  padding:clamp(24px,5vw,38px);
+  border:1px solid rgba(255,255,255,.74);
+  border-radius:30px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,.24), transparent 18rem),
+    linear-gradient(135deg, rgba(29,78,216,.96), rgba(59,130,246,.9));
+  box-shadow:var(--orchard-shadow);
+  color:#fffdf7;
+}
+.brand-hero::after {
+  content:'';
+  position:absolute;
+  width:210px;
+  height:210px;
+  right:-70px;
+  top:-90px;
+  border-radius:999px;
+  background:radial-gradient(circle, rgba(96,165,250,.54), rgba(96,165,250,.08) 62%, transparent 70%);
+  filter:blur(.2px);
+}
+.eyebrow {
+  position:relative;
+  z-index:1;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:12px;
+  padding:7px 12px;
+  border:1px solid rgba(255,255,255,.3);
+  border-radius:999px;
+  background:rgba(255,255,255,.12);
+  color:#fff4d6;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.brand-hero h1 {
+  position:relative;
+  z-index:1;
+  margin:0;
+  color:#fffdf7;
+  font-family:'Shippori Mincho','Yu Mincho',serif;
+  font-size:clamp(31px,8vw,52px);
+  line-height:1.05;
+  letter-spacing:.02em;
+}
+.hero-copy {
+  position:relative;
+  z-index:1;
+  max-width:560px;
+  margin:14px 0 0;
+  color:rgba(255,253,247,.82);
+  font-size:15px;
+  line-height:1.8;
+}
+.pill-row {
+  position:relative;
+  z-index:1;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:20px;
+}
+.pill {
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,.16);
+  color:#fff8df;
+  font-size:12px;
+  font-weight:800;
+}
+.card {
+  overflow:hidden;
+  position:relative;
+  padding:clamp(18px,4vw,24px);
+  border:1px solid var(--orchard-line);
+  border-radius:24px;
+  background:var(--orchard-card);
+  box-shadow:0 14px 36px rgba(29,78,216,.08);
+  backdrop-filter:blur(16px);
+  animation:riseIn .46s ease both;
+}
+.card::before {
+  content:'';
+  position:absolute;
+  inset:0 0 auto 0;
+  height:4px;
+  background:linear-gradient(90deg, var(--orchard-deep), var(--orchard-fresh), var(--orchard-leaf));
+}
+@keyframes riseIn {
+  from { opacity:0; transform:translateY(12px); }
+  to { opacity:1; transform:translateY(0); }
+}
+#loginBox {
+  max-width:520px;
+  margin:18px auto 12px;
+}
+h2 {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:2px 0 16px;
+  padding-left:0;
+  border-left:0;
+  color:var(--orchard-deep);
+  font-size:17px;
+  letter-spacing:.03em;
+}
+h2::before {
+  content:'';
+  width:10px;
+  height:10px;
+  border-radius:999px;
+  background:linear-gradient(135deg, var(--orchard-deep), var(--orchard-fresh));
+  box-shadow:0 0 0 6px rgba(59,130,246,.12);
+}
+label {
+  margin:14px 0 6px;
+  color:var(--orchard-muted);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.04em;
+}
+input, select, textarea {
+  min-height:46px;
+  padding:12px 13px;
+  border:1px solid rgba(33,52,45,.16);
+  border-radius:14px;
+  background:rgba(255,255,255,.78);
+  color:var(--orchard-ink);
+  font-family:inherit;
+  font-size:15px;
+  transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+textarea { line-height:1.7; }
+input:focus, select:focus, textarea:focus {
+  border-color:rgba(29,78,216,.72);
+  box-shadow:0 0 0 4px rgba(59,130,246,.18);
+  background:#fff;
+}
+input[readonly] {
+  background:rgba(235,241,232,.78);
+  color:#53665b;
+}
+.row {
+  gap:12px;
+}
+.row > div {
+  min-width:0;
+}
+button {
+  min-height:48px;
+  border-radius:16px;
+  background:linear-gradient(135deg, var(--orchard-deep), var(--orchard-leaf));
+  box-shadow:0 12px 26px rgba(29,78,216,.22);
+  font-family:inherit;
+  letter-spacing:.04em;
+  transition:transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+button:hover {
+  transform:translateY(-1px);
+  box-shadow:0 16px 34px rgba(29,78,216,.28);
+  filter:saturate(1.05);
+}
+button:active {
+  transform:translateY(0);
+}
+button:disabled {
+  background:linear-gradient(135deg, #a8b2aa, #87948d);
+  box-shadow:none;
+  cursor:not-allowed;
+}
+.info-banner {
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  margin-bottom:14px;
+  padding:14px 16px;
+  border:1px solid rgba(244,167,53,.24);
+  border-left:0;
+  border-radius:18px;
+  background:rgba(255,247,221,.84);
+  color:#8a5a08;
+  line-height:1.65;
+}
+.note {
+  color:var(--orchard-muted);
+  line-height:1.6;
+}
+.calc {
+  margin-top:14px;
+  padding:16px 18px;
+  border:1px solid rgba(59,130,246,.2);
+  border-radius:20px;
+  background:linear-gradient(135deg, rgba(219,234,254,.72), rgba(241,244,248,.9));
+}
+.calc b {
+  color:var(--orchard-deep);
+  font-size:28px;
+  letter-spacing:.02em;
+}
+.err {
+  color:#b42318;
+  line-height:1.6;
+}
+.ok {
+  color:var(--orchard-deep);
+  line-height:1.6;
+}
+#historyLink {
+  margin-top:18px !important;
+}
+.history-cta {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:46px;
+  padding:12px 18px;
+  border:1px solid rgba(29,78,216,.18);
+  border-radius:999px;
+  background:#fffdf7;
+  box-shadow:0 10px 24px rgba(29,78,216,.1);
+  color:var(--orchard-deep);
+  font-size:14px;
+  font-weight:900;
+  text-decoration:none;
+}
+.demo-login-hint {
+  margin:10px 0 12px;
+  padding:12px 14px;
+  border:1px solid rgba(29,78,216,.16);
+  border-radius:14px;
+  background:rgba(219,234,254,.72);
+  color:#1e3a5f;
+  font-size:13px;
+  font-weight:700;
+  line-height:1.7;
+}
+.demo-login-hint-title {
+  margin-bottom:2px;
+  color:#1d4ed8;
+  font-weight:900;
+}
+.demo-login-hint code {
+  display:inline-block;
+  margin-left:4px;
+  padding:1px 7px;
+  border-radius:999px;
+  background:#fff;
+  color:#1d4ed8;
+  font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size:12px;
+  font-weight:900;
+}
+.demo-login-button {
+  width:auto !important;
+  min-height:34px !important;
+  margin:9px 0 0 !important;
+  padding:8px 13px !important;
+  border-radius:999px !important;
+  font-size:13px !important;
+  letter-spacing:0 !important;
+}
+.hidden { display:none !important; }
+@media (max-width:640px) {
+  .wrap { padding-top:14px; }
+  .brand-hero { border-radius:24px; }
+  .row { flex-direction:column; gap:0; }
+  .pill { font-size:11px; }
+}
+</style>
+</head>
+<body>
+<div style="position:sticky;top:0;z-index:99;padding:8px 16px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,0,0,.06);font-size:12px;display:flex;justify-content:space-between;align-items:center">
+  <a href="../../" data-site-root style="color:#1d4ed8;text-decoration:none;font-weight:700">Back to Top</a>
+  <span style="color:#94a3b8">Sample Data</span>
+</div>
+<div class="wrap">
+  <header class="brand-hero">
+    <div class="eyebrow">Order Portal / Input Form</div>
+    <h1>入力フォーム</h1>
+    <p class="hero-copy">必要な依頼情報だけを迷わず入力できる、取引先向けのミニマム依頼フォームです。</p>
+    <div class="pill-row">
+      <span class="pill">3分で登録</span>
+      <span class="pill">PDF自動発行</span>
+      <span class="pill">履歴確認対応</span>
+    </div>
+  </header>
+
+  <!-- ログイン -->
+  <div id="loginBox" class="card">
+    <label>パスワード</label>
+    <input type="password" id="pw" placeholder="配布されたパスワードを入力">
+    <div class="demo-login-hint">
+      <div class="demo-login-hint-title">デモ用ログイン情報</div>
+      <div>パスワード:<code>demo</code></div>
+      <button class="demo-login-button" type="button" onclick="demoLogin()">デモでログイン</button>
+    </div>
+    <div style="height:10px"></div>
+    <button onclick="login()">ログイン</button>
+    <div id="loginErr" class="err"></div>
+  </div>
+
+  <!-- フォーム -->
+  <div id="formBox" class="hidden">
+
+    <div class="info-banner">
+      ℹ️ 対応チーム（サンプルチームA／B／C）は運営側でご依頼状況を見て決定しますので、入力は不要です。
+    </div>
+
+    <div class="card">
+      <h2>入力者情報</h2>
+      <label>御社名<span style="color:red">*</span></label>
+      <input type="text" id="submittedBy" placeholder="例：サンプル会社A">
+
+      <label>案件名（件名）<span style="color:red">*</span></label>
+      <input type="text" id="clientName" placeholder="例：サンプル案件A">
+
+      <label>公開先住所</label>
+      <input type="text" id="address" placeholder="例：サンプル県サンプル市中央1-1-1">
+    </div>
+
+    <div class="card">
+      <h2>商品・数量</h2>
+      <label>商品<span style="color:red">*</span></label>
+      <select id="crop" onchange="updatePrice()"></select>
+
+      <label>形式</label>
+      <select id="style">
+        <option value="レンタル">レンタル</option>
+        <option value="公開">公開</option>
+        <option value="イベント">イベント</option>
+      </select>
+
+      <div class="row">
+        <div>
+          <label>セット数<span style="color:red">*</span></label>
+          <input type="number" id="qty" min="0" step="1" value="0" oninput="calcAmount()">
+        </div>
+        <div>
+          <label>明細数（目安）</label>
+          <input type="number" id="pieces" min="0" step="1" value="0" oninput="calcAmount()">
+        </div>
+      </div>
+      <div class="note">
+        明細数を空または0にすると、1セットあたり15件で自動計算されます。
+      </div>
+
+      <label>条件（税込・自動表示）</label>
+      <input type="number" id="unitPrice" value="0" readonly>
+      <div class="note">※ 商品を選択すると自動で設定されます</div>
+
+      <div class="calc">
+        <div>ご依頼金額（税込）</div>
+        <b id="calcAmount">0</b> 円
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>日程・運搬</h2>
+      <label>実施日<span style="color:red">*</span></label>
+      <input type="date" id="eventDate" onchange="autoFillDates()">
+
+      <div class="row">
+        <div>
+          <label>積込日</label>
+          <input type="date" id="loadDate">
+          <div class="note">空欄なら前日</div>
+        </div>
+        <div>
+          <label>返却日</label>
+          <input type="date" id="returnDate">
+          <div class="note">空欄なら翌日</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>積込時間</label>
+          <input type="time" id="loadTime" value="15:00">
+        </div>
+        <div>
+          <label>荷下ろし時間</label>
+          <input type="time" id="unloadTime" value="17:00">
+        </div>
+      </div>
+
+      <label>荷下ろし場所（現地住所等）</label>
+      <input type="text" id="unloadPlace" placeholder="例：現地、または場所名">
+    </div>
+
+    <div class="card">
+      <h2>その他</h2>
+      <label>備考</label>
+      <textarea id="note" rows="3" placeholder="予備品あり、搬入口で受け渡し など"></textarea>
+    </div>
+
+    <button onclick="submit()" id="submitBtn">依頼を登録する</button>
+    <div id="msg" class="ok"></div>
+    <div id="err" class="err"></div>
+    <div id="historyLink" style="margin-top:16px; text-align:center;"></div>
+    <div style="height:30px"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var marker = '/demos/order_system/';
+  var path = window.location.pathname;
+  var index = path.indexOf(marker);
+  var base = index >= 0 ? path.slice(0, index + marker.length) : './';
+  window.orderSystemPath = function(file){ return base + file; };
+  document.write('<script src="' + base + 'mock-api.js?v=20260528-loader"><\/script>');
+})();
+</script>
+<script>
+const WEB_APP_BASE_URL = window.orderSystemPath ? window.orderSystemPath('06_history.html') : '06_history.html';
+let MASTERS = null;
+let PW = '';
+function val(id){ return document.getElementById(id).value; }
+function valTrim(id){ return val(id).trim(); }
+function formatLocalDate(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + day;
+}
+
+function demoLogin(){
+  document.getElementById('pw').value = 'demo';
+  login();
+}
+
+function hasDemoApi(){
+  return window.google && window.google.script && window.google.script.run;
+}
+
+function login(){
+  PW = document.getElementById('pw').value.trim();
+  if (!PW) { document.getElementById('loginErr').textContent='パスワードを入力してください'; return; }
+  if (!hasDemoApi()) {
+    document.getElementById('loginErr').textContent = 'デモAPIを読み込めませんでした。ページを再読み込みしてください。';
+    return;
+  }
+  document.getElementById('loginErr').textContent = '読み込み中...';
+  window.google.script.run
+    .withSuccessHandler(onMasters)
+    .withFailureHandler(e=>{
+      document.getElementById('loginErr').textContent = 'エラー: '+e.message;
+    })
+    .getPublicMasters(PW);
+}
+
+function onMasters(res){
+  if (!res.ok) {
+    document.getElementById('loginErr').textContent = res.error || '認証エラー';
+    return;
+  }
+  MASTERS = res.data;
+  document.getElementById('loginErr').textContent = '';
+  document.getElementById('loginBox').classList.add('hidden');
+  document.getElementById('formBox').classList.remove('hidden');
+  fillSelect('crop', MASTERS.crops);
+  updatePrice();
+}
+
+function fillSelect(id, arr){
+  const sel = document.getElementById(id);
+  sel.innerHTML = '';
+  arr.forEach(v=>{
+    const op = document.createElement('option'); op.value=v; op.textContent=v;
+    sel.appendChild(op);
+  });
+}
+
+function updatePrice(){
+  if (!MASTERS) return;
+  const crop = document.getElementById('crop').value;
+  const m = MASTERS.prices.find(x=>x.crop===crop);
+  document.getElementById('unitPrice').value = m ? m.unitPrice : 0;
+  calcAmount();
+}
+
+function calcAmount(){
+  const qty = Number(document.getElementById('qty').value)||0;
+  const up = Number(document.getElementById('unitPrice').value)||0;
+  const amount = Math.round(qty*up);
+  document.getElementById('calcAmount').textContent = amount.toLocaleString();
+}
+
+function autoFillDates(){
+  const ev = document.getElementById('eventDate').value;
+  if (!ev) return;
+  const d = new Date(ev);
+  const ld = new Date(d); ld.setDate(ld.getDate()-1);
+  const rd = new Date(d); rd.setDate(rd.getDate()+1);
+  if (!document.getElementById('loadDate').value)
+    document.getElementById('loadDate').value = formatLocalDate(ld);
+  if (!document.getElementById('returnDate').value)
+    document.getElementById('returnDate').value = formatLocalDate(rd);
+}
+
+function submit(){
+  document.getElementById('msg').textContent = '';
+  document.getElementById('err').textContent = '';
+  if (!valTrim('submittedBy')) {
+    document.getElementById('err').textContent = '御社名を入力してください';
+    return;
+  }
+  if (!valTrim('clientName')) {
+    document.getElementById('err').textContent = '案件名を入力してください';
+    return;
+  }
+  if (!val('crop')) {
+    document.getElementById('err').textContent = '商品を選択してください';
+    return;
+  }
+  if (!val('eventDate')) {
+    document.getElementById('err').textContent = '実施日を入力してください';
+    return;
+  }
+  if ((Number(val('qty')) || 0) <= 0) {
+    document.getElementById('err').textContent = 'セット数は1以上で入力してください';
+    return;
+  }
+  if ((Number(document.getElementById('unitPrice').value) || 0) <= 0) {
+    document.getElementById('err').textContent = '選択した商品の条件マスタが未設定です';
+    return;
+  }
+  let pieces = Number(val('pieces'));
+  if (!pieces) pieces = Number(val('qty'))*15;
+
+  const payload = {
+    submittedBy: valTrim('submittedBy'),
+    clientName:  valTrim('clientName'),
+    address:     valTrim('address'),
+    crop:        val('crop'),
+    style:       val('style'),
+    qty:         Number(val('qty')),
+    pieces:      pieces,
+    eventDate:   val('eventDate'),
+    loadDate:    val('loadDate'),
+    returnDate:  val('returnDate'),
+    loadTime:    val('loadTime'),
+    unloadTime:  val('unloadTime'),
+    unloadPlace: valTrim('unloadPlace'),
+    note:        val('note')
+  };
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('submitBtn').textContent = '送信中...';
+  google.script.run
+    .withSuccessHandler(onSubmit)
+    .withFailureHandler(e=>{
+      document.getElementById('err').textContent = 'エラー: '+e.message;
+      document.getElementById('submitBtn').disabled = false;
+      document.getElementById('submitBtn').textContent = '依頼を登録する';
+    })
+    .submitOrder(PW, payload);
+}
+
+function onSubmit(res){
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').textContent = '依頼を登録する';
+  if (!res.ok) {
+    document.getElementById('err').textContent = res.error || 'エラー';
+    return;
+  }
+  document.getElementById('msg').textContent = '✅ 登録完了: 依頼ID '+res.orderId;
+  const baseUrl = WEB_APP_BASE_URL || window.location.href.split('?')[0];
+  document.getElementById('historyLink').innerHTML =
+    '<a class="history-cta" href="'+baseUrl+'?page=history" target="_blank">過去の依頼履歴を見る</a>';
+  ['clientName','address','qty','pieces','note'].forEach(k=>{
+    document.getElementById(k).value = k==='qty'||k==='pieces' ? '0' : '';
+  });
+  calcAmount();
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>

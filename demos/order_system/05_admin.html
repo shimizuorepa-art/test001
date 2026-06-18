@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<base target="_top">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>サンプル入力受付ポータル 管理者画面</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap');
+* { box-sizing: border-box; }
+body { font-family:'Zen Kaku Gothic New','Hiragino Sans','Yu Gothic',sans-serif;
+       margin:0; padding:0; background:#f5f7f8; color:#333; }
+.wrap { max-width:1200px; margin:0 auto; padding:16px; }
+h1 { font-size:20px; margin:8px 0 16px; color:#1d4ed8; }
+.card { background:#fff; padding:16px; border-radius:12px;
+        box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:12px; }
+.tabs { display:flex; gap:4px; margin-bottom:12px; border-bottom:2px solid #e0e0e0; }
+.tab { padding:10px 18px; cursor:pointer; font-weight:bold; color:#666;
+       border-radius:8px 8px 0 0; }
+.tab.active { background:#1d4ed8; color:#fff; }
+button { padding:10px 16px; font-size:14px; font-weight:bold;
+         border:none; border-radius:8px; background:#1d4ed8; color:#fff;
+         cursor:pointer; margin-right:6px; }
+button.danger { background:#c62828; }
+button.secondary { background:#607d8b; }
+button.success { background:#1d4ed8; }
+button.warn { background:#ef6c00; }
+button.sm { padding:5px 10px; font-size:12px; margin:0 2px; }
+button:disabled { background:#9e9e9e; cursor:not-allowed; }
+input, select, textarea {
+  padding:8px; font-size:14px;
+  border:1px solid #cfd8dc; border-radius:6px; background:#fff;
+}
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th, td { border-bottom:1px solid #e0e0e0; padding:8px 6px; text-align:left; }
+th { background:#dbeafe; color:#1e3a5f; }
+tr:hover { background:#f5faff; }
+.filter { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+.stat { display:flex; gap:12px; flex-wrap:wrap; }
+.stat > div { background:#dbeafe; padding:10px 16px; border-radius:8px;
+              font-size:13px; flex:1; min-width:150px; }
+.stat b { display:block; font-size:20px; color:#1d4ed8; margin-top:4px; }
+.hidden { display:none; }
+.err { color:#c62828; font-size:13px; }
+.ok { color:#1d4ed8; font-size:13px; font-weight:bold; }
+.tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:bold; }
+.tag-sent { background:#c8e6c9; color:#1b5e20; }
+.tag-unsent { background:#ffe0b2; color:#e65100; }
+.tag-nopdf { background:#ffcdd2; color:#b71c1c; }
+.tag-nobase { background:#ffccbc; color:#bf360c; font-size:12px; padding:4px 10px; }
+.tag-base { background:#b3e5fc; color:#01579b; font-size:12px; padding:4px 10px; }
+.modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.5); display:flex;
+            justify-content:center; align-items:center; z-index:100; }
+.modal { background:#fff; border-radius:12px; padding:20px; max-width:720px;
+         width:95%; max-height:90vh; overflow:auto; }
+.modal h2 { margin-top:0; }
+.modal label { display:block; font-size:12px; color:#555; margin:6px 0 2px; }
+.modal input, .modal select, .modal textarea { width:100%; }
+.row2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.exp-panel { background:#fff3e0; padding:12px; border-radius:8px; margin-top:12px; }
+.exp-panel h3 { margin:0 0 8px; color:#e65100; font-size:14px; }
+.total-panel { background:#e8f5e9; padding:12px; border-radius:8px; margin-top:12px;
+               font-size:14px; }
+.total-panel b { color:#1d4ed8; font-size:20px; }
+.base-picker { background:#fff3e0; padding:16px; border-radius:8px; margin:16px 0; }
+.base-picker h3 { margin:0 0 10px; color:#e65100; }
+.base-btn { padding:12px 20px; font-size:15px; font-weight:bold; border:2px solid #1d4ed8;
+            background:#fff; color:#1d4ed8; border-radius:8px; cursor:pointer;
+            margin:4px; }
+.base-btn:hover { background:#1d4ed8; color:#fff; }
+.section-title { font-size:16px; font-weight:bold; color:#1d4ed8; margin:12px 0 8px; }
+
+:root {
+  --ops-ink:#1a2332;
+  --ops-muted:#5d6b82;
+  --ops-night:#1e3a5f;
+  --ops-forest:#1d4ed8;
+  --ops-blue:#1d4ed8;
+  --ops-cyan:#60a5fa;
+  --ops-mint:#93c5fd;
+  --ops-amber:#f59e0b;
+  --ops-cream:#f1f4f8;
+  --ops-card:rgba(255,255,255,.9);
+  --ops-line:rgba(29,78,216,.13);
+  --ops-shadow:0 20px 54px rgba(29,78,216,.12);
+}
+html { min-height:100%; }
+body {
+  min-height:100vh;
+  font-family:'Zen Kaku Gothic New','Hiragino Sans','Yu Gothic',sans-serif;
+  color:var(--ops-ink);
+  background:
+    radial-gradient(circle at 6% 6%, rgba(59,130,246,.12), transparent 28rem),
+    radial-gradient(circle at 92% 4%, rgba(29,78,216,.1), transparent 30rem),
+    linear-gradient(135deg, #f1f4f8 0%, #e8eef6 44%, #edf1f8 100%);
+}
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(rgba(29,78,216,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29,78,216,.04) 1px, transparent 1px);
+  background-size:38px 38px;
+  mask-image:linear-gradient(to bottom, rgba(0,0,0,.7), transparent 82%);
+}
+.wrap {
+  position:relative;
+  z-index:1;
+  max-width:1320px;
+  padding:clamp(18px,3vw,42px) 16px 60px;
+}
+.admin-hero {
+  position:relative;
+  display:flex;
+  justify-content:space-between;
+  gap:18px;
+  overflow:hidden;
+  margin:4px 0 18px;
+  padding:clamp(24px,4vw,36px);
+  border:1px solid rgba(255,255,255,.68);
+  border-radius:32px;
+  background:
+    radial-gradient(circle at 82% 20%, rgba(96,165,250,.26), transparent 16rem),
+    linear-gradient(135deg, rgba(29,78,216,.98), rgba(59,130,246,.94) 58%, rgba(96,165,250,.9));
+  box-shadow:var(--ops-shadow);
+  color:#fffdf7;
+}
+.admin-hero::after {
+  content:'';
+  position:absolute;
+  width:260px;
+  height:260px;
+  right:-90px;
+  bottom:-150px;
+  border-radius:999px;
+  background:radial-gradient(circle, rgba(96,165,250,.44), transparent 68%);
+}
+.eyebrow {
+  position:relative;
+  z-index:1;
+  display:inline-flex;
+  margin-bottom:12px;
+  padding:7px 12px;
+  border:1px solid rgba(255,255,255,.28);
+  border-radius:999px;
+  background:rgba(255,255,255,.1);
+  color:#dff7ff;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.admin-hero h1 {
+  position:relative;
+  z-index:1;
+  margin:0;
+  color:#fffdf7;
+  font-family:'Shippori Mincho','Yu Mincho',serif;
+  font-size:clamp(30px,5vw,50px);
+  line-height:1.06;
+  letter-spacing:.02em;
+}
+.hero-copy {
+  position:relative;
+  z-index:1;
+  max-width:640px;
+  margin:14px 0 0;
+  color:rgba(255,253,247,.82);
+  font-size:14px;
+  line-height:1.8;
+}
+.hero-badge {
+  position:relative;
+  z-index:1;
+  align-self:flex-start;
+  min-width:180px;
+  padding:16px 18px;
+  border:1px solid rgba(255,255,255,.24);
+  border-radius:22px;
+  background:rgba(255,255,255,.12);
+  color:#fff8df;
+  text-align:right;
+  backdrop-filter:blur(14px);
+}
+.hero-badge strong {
+  display:block;
+  color:#fff;
+  font-size:24px;
+  line-height:1;
+}
+.hero-badge span {
+  color:rgba(255,253,247,.72);
+  font-size:12px;
+  font-weight:800;
+}
+.card {
+  position:relative;
+  margin-bottom:14px;
+  padding:clamp(16px,2vw,22px);
+  border:1px solid var(--ops-line);
+  border-radius:24px;
+  background:var(--ops-card);
+  box-shadow:0 14px 36px rgba(29,78,216,.08);
+  backdrop-filter:blur(16px);
+  overflow:auto;
+  animation:panelIn .38s ease both;
+}
+@keyframes panelIn {
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+#loginBox {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  gap:10px;
+  max-width:620px;
+}
+#loginBox label,
+#loginErr {
+  flex-basis:100%;
+}
+#loginBox input {
+  width:min(340px, 100%) !important;
+}
+.demo-login-hint {
+  flex-basis:100%;
+  margin:0 0 2px;
+  padding:12px 14px;
+  border:1px solid rgba(29,78,216,.16);
+  border-radius:14px;
+  background:rgba(219,234,254,.72);
+  color:#1e3a5f;
+  font-size:13px;
+  font-weight:700;
+  line-height:1.7;
+}
+.demo-login-hint-title {
+  margin-bottom:2px;
+  color:#1d4ed8;
+  font-weight:900;
+}
+.demo-login-hint code {
+  display:inline-block;
+  margin-left:4px;
+  padding:1px 7px;
+  border-radius:999px;
+  background:#fff;
+  color:#1d4ed8;
+  font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size:12px;
+  font-weight:900;
+}
+.demo-login-button {
+  min-height:34px !important;
+  margin:9px 0 0 !important;
+  padding:8px 13px !important;
+  border-radius:999px !important;
+  font-size:13px !important;
+  letter-spacing:0 !important;
+}
+.tabs {
+  gap:8px;
+  margin:0 0 14px;
+  padding:6px;
+  border:1px solid var(--ops-line);
+  border-radius:18px;
+  background:rgba(255,255,255,.58);
+  box-shadow:0 10px 28px rgba(29,78,216,.07);
+}
+.tab {
+  border-radius:14px;
+  color:var(--ops-muted);
+  transition:background .18s ease, color .18s ease, transform .18s ease;
+}
+.tab:hover {
+  transform:translateY(-1px);
+  background:rgba(29,78,216,.08);
+  color:var(--ops-forest);
+}
+.tab.active {
+  background:linear-gradient(135deg, var(--ops-night), var(--ops-blue));
+  color:#fff;
+  box-shadow:0 10px 24px rgba(29,78,216,.18);
+}
+label {
+  color:var(--ops-muted);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.04em;
+}
+input, select, textarea {
+  min-height:40px;
+  border:1px solid rgba(20,33,29,.16);
+  border-radius:12px;
+  background:rgba(255,255,255,.82);
+  color:var(--ops-ink);
+  font-family:inherit;
+  transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+input:focus, select:focus, textarea:focus {
+  outline:none;
+  border-color:rgba(29,78,216,.68);
+  box-shadow:0 0 0 4px rgba(59,130,246,.18);
+  background:#fff;
+}
+button {
+  min-height:40px;
+  margin:4px 4px 4px 0;
+  border-radius:13px;
+  background:linear-gradient(135deg, var(--ops-blue), #3b82f6);
+  box-shadow:0 10px 22px rgba(29,78,216,.18);
+  font-family:inherit;
+  letter-spacing:.02em;
+  transition:transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+button:hover {
+  transform:translateY(-1px);
+  box-shadow:0 14px 28px rgba(29,78,216,.22);
+  filter:saturate(1.05);
+}
+button:active { transform:translateY(0); }
+button.secondary { background:linear-gradient(135deg, #53656c, #70838b); }
+button.success { background:linear-gradient(135deg, #1d4ed8, #3b82f6); }
+button.warn { background:linear-gradient(135deg, #c66a12, var(--ops-amber)); }
+button.danger { background:linear-gradient(135deg, #a72727, #d1453b); }
+button.sm {
+  min-height:32px;
+  border-radius:10px;
+}
+button:disabled {
+  background:linear-gradient(135deg, #9ca7a1, #7e8b86);
+  box-shadow:none;
+}
+.filter {
+  gap:10px;
+}
+.filter input,
+.filter select {
+  min-width:150px;
+}
+.stat {
+  gap:12px;
+}
+.stat > div {
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(29,78,216,.12);
+  border-radius:20px;
+  background:linear-gradient(135deg, rgba(255,255,255,.94), rgba(219,234,254,.68));
+  color:var(--ops-muted);
+  font-weight:800;
+}
+.stat > div::after {
+  content:'';
+  position:absolute;
+  width:90px;
+  height:90px;
+  right:-42px;
+  top:-48px;
+  border-radius:999px;
+  background:rgba(59,130,246,.15);
+}
+.stat b {
+  color:var(--ops-night);
+  font-size:24px;
+  letter-spacing:.01em;
+}
+table {
+  min-width:960px;
+  border-collapse:separate;
+  border-spacing:0;
+  color:var(--ops-ink);
+}
+th, td {
+  border-bottom:1px solid rgba(20,33,29,.08);
+  padding:11px 8px;
+  vertical-align:middle;
+}
+th {
+  position:sticky;
+  top:0;
+  z-index:1;
+  background:linear-gradient(135deg, #e8eef6, #edf1f8);
+  color:#1e3a5f;
+  font-size:12px;
+  letter-spacing:.04em;
+}
+tr:hover {
+  background:rgba(59,130,246,.08);
+}
+.tag {
+  border-radius:999px;
+  padding:4px 9px;
+  letter-spacing:.03em;
+}
+.tag-sent { background:#dff3df; color:#1f5f34; }
+.tag-unsent { background:#fff0cc; color:#9a5a00; }
+.tag-nopdf { background:#ffe0dc; color:#9d1f18; }
+.tag-nobase { background:#ffe8d5; color:#a84800; }
+.tag-base { background:#ddf5fb; color:#07576a; }
+.section-title {
+  color:var(--ops-night);
+  font-size:17px;
+  letter-spacing:.02em;
+}
+.modal-bg {
+  background:rgba(10,16,30,.58);
+  backdrop-filter:blur(8px);
+  padding:16px;
+}
+.modal {
+  border:1px solid rgba(255,255,255,.58);
+  border-radius:26px;
+  background:rgba(255,255,255,.96);
+  box-shadow:0 26px 80px rgba(10,16,30,.26);
+}
+.modal h2 {
+  color:var(--ops-night);
+  font-family:'Shippori Mincho','Yu Mincho',serif;
+  letter-spacing:.02em;
+}
+.row2, .row3 {
+  gap:10px;
+}
+.exp-panel,
+.base-picker {
+  border:1px solid rgba(240,165,58,.22);
+  border-radius:18px;
+  background:rgba(255,244,219,.86);
+}
+.total-panel {
+  border:1px solid rgba(59,130,246,.2);
+  border-radius:18px;
+  background:linear-gradient(135deg, rgba(219,234,254,.72), rgba(241,244,248,.92));
+}
+.total-panel b {
+  color:var(--ops-forest);
+  font-size:24px;
+}
+.base-btn {
+  border-color:rgba(29,78,216,.3);
+  background:#fff;
+  color:var(--ops-blue);
+  box-shadow:none;
+}
+.base-btn:hover {
+  background:linear-gradient(135deg, var(--ops-blue), var(--ops-forest));
+  color:#fff;
+}
+.err { color:#b42318; line-height:1.6; }
+.ok { color:#1d4ed8; line-height:1.6; }
+.hidden { display:none !important; }
+@media (max-width:760px) {
+  .admin-hero { display:block; border-radius:24px; }
+  .hero-badge { margin-top:18px; text-align:left; }
+  .tabs { overflow-x:auto; }
+  .tab { white-space:nowrap; }
+  .row2, .row3 { grid-template-columns:1fr; }
+  #loginBox input { width:100% !important; }
+}
+</style>
+</head>
+<body>
+<div style="position:sticky;top:0;z-index:99;padding:8px 16px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,0,0,.06);font-size:12px;display:flex;justify-content:space-between;align-items:center">
+  <a href="../../" data-site-root style="color:#1d4ed8;text-decoration:none;font-weight:700">Back to Top</a>
+  <span style="color:#94a3b8">Sample Data</span>
+</div>
+<div class="wrap">
+  <header class="admin-hero">
+    <div>
+      <div class="eyebrow">Admin Dashboard</div>
+      <h1>サンプル入力受付ポータル 管理者画面</h1>
+      <p class="hero-copy">依頼、PDF、確認書、コストと効果をひとつの画面で追える社内オペレーション画面です。</p>
+    </div>
+    <div class="hero-badge">
+      <strong>2026</strong>
+      <span>Minimum Start</span>
+    </div>
+  </header>
+
+  <div id="loginBox" class="card">
+    <label>管理者パスワード</label>
+    <input type="password" id="pw" style="width:300px">
+    <div class="demo-login-hint">
+      <div class="demo-login-hint-title">デモ用ログイン情報</div>
+      <div>パスワード:<code>demo</code></div>
+      <button class="demo-login-button" type="button" onclick="demoLogin()">デモでログイン</button>
+    </div>
+    <button onclick="login()">ログイン</button>
+    <div id="loginErr" class="err"></div>
+  </div>
+
+  <div id="app" class="hidden">
+    <!-- タブ -->
+    <div class="tabs">
+      <div class="tab active" data-tab="orders" onclick="switchTab('orders')">📋 依頼管理</div>
+      <div class="tab" data-tab="masters" onclick="switchTab('masters')">💰 条件・コストマスタ</div>
+    </div>
+
+    <!-- 依頼管理タブ -->
+    <div id="tab_orders">
+      <div class="card">
+        <div class="stat">
+          <div>件数<b id="stCount">0</b></div>
+          <div>成果(税込)<b id="stSales">¥0</b></div>
+          <div>コスト<b id="stCost">¥0</b></div>
+          <div>効果(税込)<b id="stProfit">¥0</b></div>
+          <div style="background:#fff3e0; color:#e65100;">チーム未決定<b id="stNoBase" style="color:#bf360c;">0</b></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="filter">
+          <input type="text" id="fSearch" placeholder="🔍 件名・御社名で検索" oninput="render()" style="flex:1; min-width:200px">
+          <select id="fCrop" onchange="render()"><option value="">全商品</option></select>
+          <select id="fBase" onchange="render()">
+            <option value="">全チーム</option>
+            <option value="__nobase__">🔸 チーム未決定のみ</option>
+          </select>
+          <select id="fDelivery" onchange="render()">
+            <option value="">全確認書状態</option>
+            <option value="unsent">未送信</option>
+            <option value="sent">送信済</option>
+          </select>
+          <input type="month" id="fMonth" onchange="render()">
+          <button onclick="clearFilter()" class="secondary">クリア</button>
+          <button onclick="reload()">🔄 更新</button>
+          <button onclick="exportCsv()" class="secondary">📥 CSV</button>
+        </div>
+        <div id="dataStatus" class="err" style="margin-top:8px;">診断: 読み込み前</div>
+      </div>
+
+      <div class="card">
+        <table id="tbl">
+          <thead>
+            <tr>
+              <th>実施日</th><th>件名</th><th>御社名</th><th>チーム</th>
+              <th>商品</th><th>セット数</th><th>成果</th><th>コスト</th><th>コスト率</th>
+              <th>依頼書</th><th>確認書</th><th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- マスタタブ -->
+    <div id="tab_masters" class="hidden">
+      <div class="card">
+        <div class="section-title">💰 条件マスタ（取引先にも表示される）</div>
+        <div style="font-size:12px; color:#777; margin-bottom:10px;">
+          商品ごとの1セットあたり条件（税込）。Webフォームで商品を選ぶと自動表示される値です。
+        </div>
+        <table id="priceTable">
+          <thead><tr><th>商品</th><th>条件(税込/セット)</th><th>備考</th><th>操作</th></tr></thead>
+          <tbody id="priceBody"></tbody>
+        </table>
+        <button onclick="addPriceRow()" class="secondary sm">➕ 行を追加</button>
+        <button onclick="savePriceMaster()" class="success">💾 条件マスタを保存</button>
+        <span id="priceMsg" class="ok"></span>
+      </div>
+
+      <div class="card">
+        <div class="section-title" style="color:#c62828;">🔒 コストマスタ（社内のみ・取引先には非表示）</div>
+        <div style="font-size:12px; color:#777; margin-bottom:10px;">
+          商品ごとの1明細あたりコスト。確認書・総表・効果計算に使われます。取引先のWebフォームには表示されません。
+        </div>
+        <table id="costTable">
+          <thead><tr><th>商品</th><th>コスト(円/明細)</th><th>備考</th><th>操作</th></tr></thead>
+          <tbody id="costBody"></tbody>
+        </table>
+        <button onclick="addCostRow()" class="secondary sm">➕ 行を追加</button>
+        <button onclick="saveCostMaster()" class="success">💾 コストマスタを保存</button>
+        <span id="costMsg" class="ok"></span>
+      </div>
+
+      <div class="card">
+        <div class="section-title">♻️ マスタ変更後の再計算</div>
+        <div style="font-size:13px; color:#555; margin-bottom:10px;">
+          条件またはコストを変更した場合、既存の全依頼の金額・コストを最新マスタで再計算できます。<br>
+          <b style="color:#c62828;">※ 過去の依頼も一括で上書きされます。通常は新規依頼のみに反映されます。</b>
+        </div>
+        <button onclick="recalcAll()" class="warn">♻️ 全依頼を再計算する</button>
+        <span id="recalcMsg" class="ok"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 編集モーダル -->
+  <div id="modal" class="modal-bg hidden" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h2 id="modalTitle">編集</h2>
+
+      <!-- チーム決定セクション（チーム未決定時のみ表示） -->
+      <div id="basePicker" class="base-picker hidden">
+        <h3>🚨 対応チームが未決定です</h3>
+        <div style="font-size:13px; color:#333; margin-bottom:12px;">
+          どのチームで対応するか決定してください：
+        </div>
+        <div id="baseBtns"></div>
+        <div style="margin-top:10px;">
+          <label>取引先タイプ</label>
+          <select id="pickerClientType" style="width:200px;"></select>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div><label>御社名（入力者）</label><input type="text" id="e_submittedBy"></div>
+        <div><label>場所名</label><input type="text" id="e_clientName"></div>
+        <div><label>住所</label><input type="text" id="e_address"></div>
+        <div><label>対応チーム</label><select id="e_base"></select></div>
+        <div><label>販売先（自動）</label><input type="text" id="e_client" readonly style="background:#f5f5f5;"></div>
+        <div><label>商品</label><select id="e_crop" onchange="onCropChange()"></select></div>
+        <div><label>形式</label>
+          <select id="e_style">
+            <option>レンタル</option><option>公開</option><option>イベント</option>
+          </select>
+        </div>
+        <div><label>セット数</label><input type="number" id="e_qty" oninput="recalcModal()"></div>
+        <div><label>明細数</label><input type="number" id="e_pieces" oninput="recalcModal()"></div>
+        <div><label>条件(税込)【マスタ自動】</label><input type="number" id="e_unitPrice" readonly style="background:#f5f5f5;"></div>
+        <div><label>コスト条件【マスタ自動】</label><input type="number" id="e_unitCost" readonly style="background:#f5f5f5;"></div>
+        <div><label>金額(税込)</label><input type="number" id="e_amount" readonly style="background:#f5f5f5;"></div>
+        <div><label>コスト</label><input type="number" id="e_cost" readonly style="background:#f5f5f5;"></div>
+        <div><label>実施日</label><input type="date" id="e_eventDate"></div>
+        <div><label>積込日</label><input type="date" id="e_loadDate"></div>
+        <div><label>返却日</label><input type="date" id="e_returnDate"></div>
+        <div><label>積込時間</label><input type="time" id="e_loadTime"></div>
+        <div><label>荷下ろし時間</label><input type="time" id="e_unloadTime"></div>
+        <div><label>積込場所</label><input type="text" id="e_loadPlace"></div>
+        <div><label>荷下ろし場所</label><input type="text" id="e_unloadPlace"></div>
+        <div><label>連携担当</label><select id="e_carrier"></select></div>
+        <div><label>車種</label><select id="e_car"></select></div>
+        <div><label>社内担当</label><select id="e_staff"></select></div>
+        <div><label>レント手配</label><input type="text" id="e_rentHandler"></div>
+        <div><label>依頼書URL</label><input type="text" id="e_orderFileUrl"></div>
+        <div><label>ステータス</label>
+          <select id="e_status"><option>有効</option><option>チーム未決定</option><option>キャンセル</option></select>
+        </div>
+      </div>
+      <label>備考</label>
+      <textarea id="e_note" rows="2"></textarea>
+      <div id="modalMsg" class="ok"></div>
+      <div id="modalErr" class="err"></div>
+      <div style="margin-top:12px;">
+        <button onclick="saveEdit()">💾 保存</button>
+        <button onclick="deleteCurrent()" class="danger">🗑 削除</button>
+        <button onclick="closeModal()" class="secondary">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 確認書送信モーダル -->
+  <div id="delModal" class="modal-bg hidden" onclick="if(event.target===this)closeDelModal()">
+    <div class="modal">
+      <h2>📄 確認書 経費入力 & 送信</h2>
+      <div id="delInfo" style="margin-bottom:12px; background:#e3f2fd; padding:10px; border-radius:6px; font-size:13px;"></div>
+
+      <div class="exp-panel">
+        <h3>🧾 当日経費（日計DBに反映）</h3>
+        <div class="row3">
+          <div><label>人件費</label><input type="number" id="exp_personnel" value="0" oninput="updateDelTotal()"></div>
+          <div><label>交通費</label><input type="number" id="exp_transport" value="0" oninput="updateDelTotal()"></div>
+          <div><label>燃料費</label><input type="number" id="exp_fuel" value="0" oninput="updateDelTotal()"></div>
+          <div><label>レンタカー</label><input type="number" id="exp_rental" value="0" oninput="updateDelTotal()"></div>
+          <div><label>雑費</label><input type="number" id="exp_misc" value="0" oninput="updateDelTotal()"></div>
+        </div>
+      </div>
+
+      <div class="total-panel">
+        依頼金額: <b id="delAmount">¥0</b> / 諸経費合計: <b id="delExpTotal">¥0</b><br>
+        <span style="font-size:16px;">合計確認額: </span><b id="delGrand">¥0</b>
+      </div>
+
+      <div style="margin-top:16px;">
+        <label>送信先メールアドレス<span style="color:red">*</span></label>
+        <input type="email" id="delTo" placeholder="取引先マスタから自動取得">
+        <label>CC（任意）</label>
+        <input type="email" id="delCc" placeholder="自社内共有用">
+        <label>件名</label>
+        <input type="text" id="delSubject">
+        <label>本文（空なら自動生成文を使用）</label>
+        <textarea id="delBody" rows="6" placeholder="空のままにすると、依頼情報から自動生成された標準文面が使われます"></textarea>
+      </div>
+
+      <div id="delMsg" class="ok"></div>
+      <div id="delErr" class="err"></div>
+      <div style="margin-top:12px;">
+        <button onclick="saveExpOnly()" class="warn">💾 経費のみ保存</button>
+        <button onclick="sendDelivery()" class="success">📧 経費保存+確認書送信</button>
+        <button onclick="closeDelModal()" class="secondary">キャンセル</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var marker = '/demos/order_system/';
+  var path = window.location.pathname;
+  var index = path.indexOf(marker);
+  var base = index >= 0 ? path.slice(0, index + marker.length) : './';
+  window.orderSystemPath = function(file){ return base + file; };
+  document.write('<script src="' + base + 'mock-api.js?v=20260528-loader"><\/script>');
+})();
+</script>
+<script>
+let PW='';
+let MASTERS=null;
+let ORDERS=[];
+let currentId=null;
+let currentOrder=null;
+
+function demoLogin(){
+  document.getElementById('pw').value = 'demo';
+  login();
+}
+
+function hasDemoApi(){
+  return window.google && window.google.script && window.google.script.run;
+}
+
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector('.tab[data-tab="'+name+'"]').classList.add('active');
+  document.getElementById('tab_orders').classList.toggle('hidden', name!=='orders');
+  document.getElementById('tab_masters').classList.toggle('hidden', name!=='masters');
+  if (name==='masters') renderMasters();
+}
+
+function login(){
+  PW = document.getElementById('pw').value.trim();
+  if (!PW) { document.getElementById('loginErr').textContent='パスワードを入力してください'; return; }
+  if (!hasDemoApi()) {
+    document.getElementById('loginErr').textContent = 'デモAPIを読み込めませんでした。ページを再読み込みしてください。';
+    return;
+  }
+  document.getElementById('loginErr').textContent = '読み込み中...';
+  window.google.script.run
+    .withSuccessHandler(onMasters)
+    .withFailureHandler(e=>document.getElementById('loginErr').textContent='エラー: '+e.message)
+    .getMasters(PW,'admin');
+}
+function onMasters(res){
+  if (!res.ok) { document.getElementById('loginErr').textContent=res.error; return; }
+  MASTERS = res.data;
+  document.getElementById('loginErr').textContent = '';
+  document.getElementById('loginBox').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  resetFilters();
+  fillFilter('fCrop', MASTERS.crops);
+  fillFilterBase();
+
+  ['e_crop','e_base','e_staff','e_carrier','e_car'].forEach(id=>{
+    const sel=document.getElementById(id); sel.innerHTML='';
+    const op=document.createElement('option'); op.value=''; op.textContent=''; sel.appendChild(op);
+    const key = id.replace('e_','');
+    const arr = (key==='crop'?MASTERS.crops :
+                 key==='base'?MASTERS.bases :
+                 key==='staff'?MASTERS.staff :
+                 key==='carrier'?MASTERS.carriers : MASTERS.cars);
+    arr.forEach(v=>{const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o);});
+  });
+
+  // 取引先タイプ用select
+  const pct = document.getElementById('pickerClientType');
+  pct.innerHTML='';
+  (MASTERS.clients||[]).forEach(v=>{
+    const o=document.createElement('option'); o.value=v; o.textContent=v; pct.appendChild(o);
+  });
+
+  reload();
+}
+function fillFilter(id, arr){
+  const sel=document.getElementById(id);
+  while (sel.options.length > 1) sel.remove(1);
+  (arr || []).forEach(v=>{
+    const op=document.createElement('option'); op.value=v; op.textContent=v; sel.appendChild(op);
+  });
+}
+function fillFilterBase(){
+  const sel = document.getElementById('fBase');
+  while (sel.options.length > 2) sel.remove(2);
+  (MASTERS.bases||[]).forEach(v=>{
+    const op=document.createElement('option'); op.value=v; op.textContent=v; sel.appendChild(op);
+  });
+}
+function resetFilters(){
+  const values = { fSearch:'', fCrop:'', fBase:'', fMonth:'', fDelivery:'' };
+  Object.entries(values).forEach(([id, value])=>{
+    const el = document.getElementById(id);
+    if (el) el.value = value;
+  });
+}
+
+function reload(){
+  showDataStatus({ loading:true });
+  google.script.run
+    .withSuccessHandler(res=>{
+      if (!res.ok) { alert(res.error); return; }
+      ORDERS = Array.isArray(res.data) ? res.data : [];
+      showDataStatus(res);
+      render();
+    })
+    .withFailureHandler(e=>{
+      showDataStatus({ error:e && e.message ? e.message : String(e) });
+      alert('エラー: '+e.message);
+    })
+    .listOrders(PW);
+}
+
+function showDataStatus(res){
+  const el = document.getElementById('dataStatus');
+  if (!el) return;
+  if (res && res.loading) {
+    el.textContent = '診断: 依頼DBを読み込み中...';
+    return;
+  }
+  if (res && res.error) {
+    el.textContent = '診断エラー: ' + res.error;
+    return;
+  }
+  const meta = res && res.meta ? res.meta : null;
+  if (!meta) {
+    const count = Array.isArray(res && res.data) ? res.data.length : 0;
+    el.textContent =
+      '診断情報なし: Code.gsが古い、または再デプロイに反映されていません。' +
+      ' 01_Code.gsを保存して新バージョンでデプロイしてください。取得件数=' + count;
+    return;
+  }
+  const ss = meta.spreadsheet || {};
+  const order = meta['依頼DB'];
+  const daily = meta['日計DB'];
+  const summary = meta['総表'];
+  el.textContent =
+    '版: ' + (meta.appVersion || '不明') +
+    '　接続先: ' + (ss.name || '') + ' / ' + (ss.id || '') +
+    '　診断: 依頼DB=' + (order && order.exists ? order.lastRow + '行' : 'なし') +
+    ' / 日計DB=' + (daily && daily.exists ? daily.lastRow + '行' : 'なし') +
+    ' / 総表=' + (summary && summary.exists ? summary.lastRow + '行' : 'なし');
+}
+
+function render(){
+  const s = document.getElementById('fSearch').value.toLowerCase();
+  const fc = document.getElementById('fCrop').value;
+  const fb = document.getElementById('fBase').value;
+  const fm = document.getElementById('fMonth').value;
+  const fd = document.getElementById('fDelivery').value;
+  const filtered = ORDERS.filter(o=>{
+    if (o.status==='キャンセル') return false;
+    if (s && !(o.clientName||'').toLowerCase().includes(s)
+         && !(o.submittedBy||'').toLowerCase().includes(s)) return false;
+    if (fc && o.crop!==fc) return false;
+    if (fb==='__nobase__' && o.base) return false;
+    if (fb && fb!=='__nobase__' && o.base!==fb) return false;
+    if (fm && !(o.eventDate||'').startsWith(fm)) return false;
+    if (fd==='sent' && !o.deliverySentAt) return false;
+    if (fd==='unsent' && o.deliverySentAt) return false;
+    return true;
+  });
+
+  let sales=0, cost=0, noBase=0;
+  filtered.forEach(o=>{
+    sales+=Number(o.amount)||0; cost+=Number(o.cost)||0;
+    if (!o.base) noBase++;
+  });
+  document.getElementById('stCount').textContent = filtered.length;
+  document.getElementById('stSales').textContent = '¥'+sales.toLocaleString();
+  document.getElementById('stCost').textContent  = '¥'+cost.toLocaleString();
+  document.getElementById('stProfit').textContent='¥'+(sales-cost).toLocaleString();
+  document.getElementById('stNoBase').textContent = noBase;
+
+  const tb = document.getElementById('tbody'); tb.innerHTML='';
+  filtered.forEach(o=>{
+    const costRate = getCostRate(o);
+    const orderTag = o.orderFileUrl
+      ? `<a href="${o.orderFileUrl}" target="_blank">📄</a>`
+      : '<span class="tag tag-nopdf">未</span>';
+    const delTag = o.deliverySentAt
+      ? `<span class="tag tag-sent">✅${o.deliverySentAt}</span>`
+      : '<span class="tag tag-unsent">未送信</span>';
+    const baseTag = o.base
+      ? `<span class="tag tag-base">${esc(o.base)}</span>`
+      : '<span class="tag tag-nobase">🔸未決定</span>';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${o.eventDate||''}</td>
+      <td>${esc(o.clientName)}</td>
+      <td>${esc(o.submittedBy)}</td>
+      <td>${baseTag}</td>
+      <td>${esc(o.crop)}</td>
+      <td>${o.qty||''}</td>
+      <td>¥${(Number(o.amount)||0).toLocaleString()}</td>
+      <td>¥${(Number(o.cost)||0).toLocaleString()}</td>
+      <td>${fmtRate(costRate)}</td>
+      <td>${orderTag}</td>
+      <td>${delTag}</td>
+      <td>
+        <button onclick="openEdit('${o.id}')" class="sm">編集</button>
+        ${o.base ? `<button onclick="openDelivery('${o.id}')" class="success sm">確認書</button>` : ''}
+      </td>
+    `;
+    tb.appendChild(tr);
+  });
+  if (!filtered.length) {
+    tb.innerHTML = '<tr><td colspan="12" style="padding:18px; text-align:center; color:#666;">依頼がありません。フィルタ条件も確認してください。</td></tr>';
+  }
+}
+function esc(s){ return (s==null?'':String(s)).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
+function getCostRate(o){
+  const sales = Number(o && o.amount) || 0;
+  const cost = Number(o && o.cost) || 0;
+  return sales > 0 ? cost / sales : 0;
+}
+function fmtRate(v){
+  return ((Number(v)||0) * 100).toFixed(1) + '%';
+}
+
+function clearFilter(){
+  ['fSearch','fCrop','fBase','fMonth','fDelivery'].forEach(id=>{
+    document.getElementById(id).value='';
+  });
+  render();
+}
+
+// ===== 編集モーダル =====
+function openEdit(id){
+  const o = ORDERS.find(x=>x.id===id);
+  if (!o) return;
+  currentId = id;
+  currentOrder = o;
+  document.getElementById('modalTitle').textContent = '編集: '+id +
+    (!o.base ? ' 🔸チーム未決定' : '');
+
+  ['submittedBy','clientName','address','client','base','crop','style',
+   'qty','pieces','unitPrice','unitCost','amount','cost',
+   'eventDate','loadDate','returnDate',
+   'loadTime','unloadTime','loadPlace','unloadPlace','carrier','car','staff',
+   'rentHandler','orderFileUrl','status','note'].forEach(k=>{
+    const el = document.getElementById('e_'+k);
+    if (el) el.value = o[k] == null ? '' : o[k];
+  });
+
+  // チーム未決定ならチーム決定UIを表示
+  const picker = document.getElementById('basePicker');
+  const btns = document.getElementById('baseBtns');
+  btns.innerHTML = '';
+  const needsBaseDecision = !String(o.base || '').trim()
+    || !String(o.client || '').trim()
+    || o.status === 'チーム未決定';
+  if (needsBaseDecision) {
+    picker.classList.remove('hidden');
+    (MASTERS.bases||[]).forEach(b=>{
+      const btn = document.createElement('button');
+      btn.className = 'base-btn';
+      btn.textContent = '🌾 ' + b + ' から対応';
+      btn.onclick = ()=>quickAssignBase(b);
+      btns.appendChild(btn);
+    });
+  } else {
+    picker.classList.add('hidden');
+  }
+
+  document.getElementById('modal').classList.remove('hidden');
+  document.getElementById('modalMsg').textContent='';
+  document.getElementById('modalErr').textContent='';
+}
+
+function quickAssignBase(base){
+  const clientType = document.getElementById('pickerClientType').value || 'サンプル会社A';
+  if (!confirm(base + 'チームから対応することを確定しますか？\n販売先：' + base + '_' + clientType)) return;
+  document.getElementById('modalMsg').textContent = 'チームを確定中...';
+  google.script.run
+    .withSuccessHandler(res=>{
+      if (!res.ok) { document.getElementById('modalErr').textContent = res.error; return; }
+      document.getElementById('modalMsg').textContent = '✅ チーム確定しました';
+      reload();
+      setTimeout(()=>{
+        closeModal();
+      }, 1000);
+    })
+    .withFailureHandler(e=>document.getElementById('modalErr').textContent='エラー: '+e.message)
+    .assignBase(PW, currentId, base, clientType);
+}
+
+function onCropChange(){
+  const crop = document.getElementById('e_crop').value;
+  const m = (MASTERS.prices||[]).find(x=>x.crop===crop);
+  const c = (MASTERS.costs||[]).find(x=>x.crop===crop);
+  document.getElementById('e_unitPrice').value = m ? m.unitPrice : 0;
+  document.getElementById('e_unitCost').value  = c ? c.unitCost : 0;
+  recalcModal();
+}
+function recalcModal(){
+  const up = Number(document.getElementById('e_unitPrice').value)||0;
+  const uc = Number(document.getElementById('e_unitCost').value)||0;
+  const q  = Number(document.getElementById('e_qty').value)||0;
+  const p  = Number(document.getElementById('e_pieces').value)||0;
+  document.getElementById('e_amount').value = Math.round(q*up);
+  document.getElementById('e_cost').value   = Math.round(p*uc);
+  // 販売先を自動生成
+  const base = document.getElementById('e_base').value;
+  const o = currentOrder;
+  if (base && o && o.client) {
+    const body = o.client.indexOf('_')>=0
+      ? o.client.split('_').slice(1).join('_')
+      : o.client;
+    document.getElementById('e_client').value = base + '_' + (body || 'サンプル会社A');
+  } else if (base) {
+    document.getElementById('e_client').value = base + '_サンプル会社A';
+  }
+}
+// チーム変更時も販売先再計算
+document.addEventListener('change', e=>{
+  if (e.target && e.target.id==='e_base') recalcModal();
+});
+
+function closeModal(){ document.getElementById('modal').classList.add('hidden'); }
+
+function saveEdit(){
+  const payload = {};
+  ['submittedBy','clientName','address','client','base','crop','style',
+   'qty','pieces','eventDate','loadDate','returnDate',
+   'loadTime','unloadTime','loadPlace','unloadPlace','carrier','car','staff',
+   'rentHandler','orderFileUrl','status','note'].forEach(k=>{
+    payload[k] = document.getElementById('e_'+k).value;
+  });
+  google.script.run
+    .withSuccessHandler(res=>{
+      if (!res.ok) { document.getElementById('modalErr').textContent=res.error; return; }
+      document.getElementById('modalMsg').textContent='保存しました';
+      reload();
+      setTimeout(closeModal, 500);
+    })
+    .withFailureHandler(e=>document.getElementById('modalErr').textContent='エラー: '+e.message)
+    .updateOrder(PW, currentId, payload);
+}
+
+function deleteCurrent(){
+  if (!confirm('この依頼を削除します。よろしいですか？')) return;
+  google.script.run
+    .withSuccessHandler(res=>{
+      if (!res.ok) { alert(res.error); return; }
+      reload(); closeModal();
+    })
+    .withFailureHandler(e=>alert('エラー: '+e.message))
+    .deleteOrder(PW, currentId);
+}
+
+// ===== 確認書モーダル =====
+function openDelivery(id){
+  const o = ORDERS.find(x=>x.id===id);
+  if (!o) return;
+  if (!o.base) { alert('先に対応チームを決定してください'); return; }
+  currentId = id;
+  currentOrder = o;
+
+  document.getElementById('delInfo').innerHTML = `
+    <b>${esc(o.clientName)}</b> / ${esc(o.base)}チーム / ${o.eventDate}<br>
+    ${esc(o.crop)} ${o.qty}セット×${Number(o.unitPrice||0).toLocaleString()}円 = ¥${(Number(o.amount)||0).toLocaleString()}
+  `;
+
+  google.script.run
+    .withSuccessHandler(res=>{
+      if (res && res.ok && res.data) {
+        document.getElementById('exp_personnel').value = res.data.personnel || 0;
+        document.getElementById('exp_transport').value = res.data.transport || 0;
+        document.getElementById('exp_fuel').value      = res.data.fuel || 0;
+        document.getElementById('exp_rental').value    = res.data.rental || 0;
+        document.getElementById('exp_misc').value      = res.data.misc || 0;
+      }
+      updateDelTotal();
+    })
+    .withFailureHandler(()=>{ updateDelTotal(); })
+    .getDailyExpenses(PW, id);
+
+  google.script.run
+    .withSuccessHandler(res=>{
+      if (res && res.ok && res.email) {
+        document.getElementById('delTo').value = res.email;
+      }
+    })
+    .getPartnerEmail(PW, o.submittedBy);
+
+  document.getElementById('delSubject').value =
+    '【確認書】' + o.eventDate + ' ' + (o.clientName||'');
+  document.getElementById('delBody').value = '';
+  document.getElementById('delMsg').textContent = '';
+  document.getElementById('delErr').textContent = '';
+  document.getElementById('delModal').classList.remove('hidden');
+}
+
+function closeDelModal(){
+  document.getElementById('delModal').classList.add('hidden');
+}
+
+function updateDelTotal(){
+  const o = currentOrder;
+  if (!o) return;
+  const p = Number(document.getElementById('exp_personnel').value)||0;
+  const t = Number(document.getElementById('exp_transport').value)||0;
+  const f = Number(document.getElementById('exp_fuel').value)||0;
+  const r = Number(document.getElementById('exp_rental').value)||0;
+  const m = Number(document.getElementById('exp_misc').value)||0;
+  const expTotal = p+t+f+r+m;
+  const amount = Number(o.amount)||0;
+  document.getElementById('delAmount').textContent = '¥'+amount.toLocaleString();
+  document.getElementById('delExpTotal').textContent = '¥'+expTotal.toLocaleString();
+  document.getElementById('delGrand').textContent = '¥'+(amount+expTotal).toLocaleString();
+}
+
+function getExpPayload(){
+  return {
+    personnel: Number(document.getElementById('exp_personnel').value)||0,
+    transport: Number(document.getElementById('exp_transport').value)||0,
+    fuel:      Number(document.getElementById('exp_fuel').value)||0,
+    rental:    Number(document.getElementById('exp_rental').value)||0,
+    misc:      Number(document.getElementById('exp_misc').value)||0
+  };
+}
+
+function saveExpOnly(){
+  document.getElementById('delMsg').textContent = '保存中...';
+  document.getElementById('delErr').textContent = '';
+  google.script.run
+    .withSuccessHandler(res=>{
+      if (!res.ok) { document.getElementById('delErr').textContent = res.error; return; }
+      document.getElementById('delMsg').textContent = '経費を保存しました';
+      reload();
+    })
+    .withFailureHandler(e=>document.getElementById('delErr').textContent='エラー: '+e.message)
+    .updateDailyExpenses(PW, currentId, getExpPayload());
+}
+
+function sendDelivery(){
+  const to = document.getElementById('delTo').value.trim();
+  if (!to) { document.getElementById('delErr').textContent = '送信先を入力してください'; return; }
+  if (!confirm(to + ' 宛に確認書を送信します。よろしいですか？')) return;
+
+  document.getElementById('delMsg').textContent = '送信中...（10〜20秒）';
+  document.getElementById('delErr').textContent = '';
+
+  google.script.run
+    .withSuccessHandler(res=>{
+      if (!res.ok) {
+        document.getElementById('delErr').textContent = '経費保存エラー: ' + res.error;
+        return;
+      }
+      google.script.run
+        .withSuccessHandler(res2=>{
+          if (!res2.ok) { document.getElementById('delErr').textContent = '送信エラー: '+res2.error; return; }
+          document.getElementById('delMsg').textContent =
+            '✅ 送信完了: ' + res2.sentTo;
+          reload();
+          setTimeout(closeDelModal, 2000);
+        })
+        .withFailureHandler(e=>document.getElementById('delErr').textContent='送信エラー: '+e.message)
+        .sendDeliveryNote(PW, currentId,
+          to,
+          document.getElementById('delCc').value.trim(),
+          document.getElementById('delSubject').value,
+          document.getElementById('delBody').value);
+    })
+    .withFailureHandler(e=>document.getElementById('delErr').textContent='エラー: '+e.message)
+    .updateDailyExpenses(PW, currentId, getExpPayload());
+}
+
+// ===== マスタタブ =====
+function renderMasters(){
+  renderPriceMaster();
+  renderCostMaster();
+}
+function renderPriceMaster(){
+  const tb = document.getElementById('priceBody');
+  tb.innerHTML = '';
+  (MASTERS.prices || []).forEach((p,i)=>{
+    tb.appendChild(makePriceRow(p, i));
+  });
+}
+function makePriceRow(p, i){
+  const tr = document.createElement('tr');
+  const cropSel = MASTERS.crops.map(c=>
+    '<option '+(c===(p?p.crop:'')?'selected':'')+'>'+esc(c)+'</option>'
+  ).join('');
+  tr.innerHTML = `
+    <td><select class="p-crop" style="width:100%;"><option value=""></option>${cropSel}</select></td>
+    <td><input type="number" class="p-price" value="${p?p.unitPrice:0}" style="width:100%;"></td>
+    <td><input type="text" class="p-note" value="${esc(p?p.note:'')}" style="width:100%;"></td>
+    <td><button class="danger sm" onclick="this.closest('tr').remove()">削除</button></td>
+  `;
+  return tr;
+}
+function addPriceRow(){
+  document.getElementById('priceBody').appendChild(makePriceRow(null, -1));
+}
+function savePriceMaster(){
+  const rows = Array.from(document.querySelectorAll('#priceBody tr')).map(tr=>({
+    crop: tr.querySelector('.p-crop').value,
+    unitPrice: Number(tr.querySelector('.p-price').value)||0,
+    note: tr.querySelector('.p-note').value
+  })).filter(r=>r.crop);
+  document.getElementById('priceMsg').textContent = '保存中...';
+  google.script.run
+    .withSuccessHandler(res=>{
+      if (!res.ok) { document.getElementById('priceMsg').textContent = 'エラー: '+res.error; return; }
+      document.getElementById('priceMsg').textContent = '✅ 保存しました';
+      // マスタ再読込
+      google.script.run
+        .withSuccessHandler(r2=>{ if (r2.ok) { MASTERS = r2.data; renderMasters(); } })
+        .getMasters(PW,'admin');
+    })
+    .withFailureHandler(e=>document.getElementById('priceMsg').textContent='エラー: '+e.message)
+    .updatePriceMaster(PW, rows);
+}
+
+function renderCostMaster(){
+  const tb = document.getElementById('costBody');
+  tb.innerHTML = '';
+  (MASTERS.costs || []).forEach((c,i)=>{
+    tb.appendChild(makeCostRow(c, i));
+  });
+}
+function makeCostRow(p, i){
+  const tr = document.createElement('tr');
+  const cropSel = MASTERS.crops.map(c=>
+    '<option '+(c===(p?p.crop:'')?'selected':'')+'>'+esc(c)+'</option>'
+  ).join('');
+  tr.innerHTML = `
+    <td><select class="c-crop" style="width:100%;"><option value=""></option>${cropSel}</select></td>
+    <td><input type="number" class="c-cost" value="${p?p.unitCost:0}" style="width:100%;" step="0.01"></td>
+    <td><input type="text" class="c-note" value="${esc(p?p.note:'')}" style="width:100%;"></td>
+    <td><button class="danger sm" onclick="this.closest('tr').remove()">削除</button></td>
+  `;
+  return tr;
+}
+function addCostRow(){
+  document.getElementById('costBody').appendChild(makeCostRow(null, -1));
+}
+function saveCostMaster(){
+  const rows = Array.from(document.querySelectorAll('#costBody tr')).map(tr=>({
+    crop: tr.querySelector('.c-crop').value,
+    unitCost: Number(tr.querySelector('.c-cost').value)||0,
+    note: tr.querySelector('.c-note').value
+  })).filter(r=>r.crop);
+  document.getElementById('costMsg').textContent = '保存中...';
+  google.script.run
+    .withSuccessHandler(res=>{
+      if (!res.ok) { document.getElementById('costMsg').textContent = 'エラー: '+res.error; return; }
+      document.getElementById('costMsg').textContent = '✅ 保存しました';
+      google.script.run
+        .withSuccessHandler(r2=>{ if (r2.ok) { MASTERS = r2.data; renderMasters(); } })
+        .getMasters(PW,'admin');
+    })
+    .withFailureHandler(e=>document.getElementById('costMsg').textContent='エラー: '+e.message)
+    .updateCostMaster(PW, rows);
+}
+
+function recalcAll(){
+  if (!confirm('全依頼の金額・コストを、現在のマスタ値で再計算します。\n過去の依頼も上書きされます。よろしいですか？')) return;
+  document.getElementById('recalcMsg').textContent = '再計算中...（数秒〜数十秒）';
+  google.script.run
+    .withSuccessHandler(res=>{
+      if (!res.ok) { document.getElementById('recalcMsg').textContent = 'エラー: '+res.error; return; }
+      document.getElementById('recalcMsg').textContent = '✅ ' + res.updated + '件 再計算しました';
+      reload();
+    })
+    .withFailureHandler(e=>document.getElementById('recalcMsg').textContent='エラー: '+e.message)
+    .recalcAllOrders(PW);
+}
+
+function exportCsv(){
+  const rows = [['実施日','件名','御社名','チーム','商品','形式','セット数','明細数','条件','成果','コスト','コスト率','確認書送信日','備考']];
+  ORDERS.forEach(o=>{
+    if (o.status==='キャンセル') return;
+    rows.push([o.eventDate,o.clientName,o.submittedBy,o.base,o.crop,o.style,
+               o.qty,o.pieces,o.unitPrice,o.amount,o.cost, fmtRate(getCostRate(o)), o.deliverySentAt||'', o.note]);
+  });
+  const csv = rows.map(r=>r.map(v=>'"'+(v==null?'':String(v)).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url;
+  a.download = 'orders_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+</script>
+</body>
+</html>

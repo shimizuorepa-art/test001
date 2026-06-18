@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketing Dashboard | Web Application Samples</title>
+<style>
+:root{
+  --ink:#1a2332;--muted:#5d6b82;--line:#dce3ed;--paper:#ffffff;
+  --bg:#f1f4f8;--soft:#f8fafb;--teal:#1d4ed8;--green:#15803d;
+  --blue:#1d4ed8;--amber:#b45309;--red:#be123c;--teal-soft:#eff4ff;
+  --shadow:0 4px 24px rgba(23,32,51,.07);
+  --shadow-soft:0 2px 12px rgba(23,32,51,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  min-height:100vh;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
+  line-height:1.55;
+}
+.top-header{
+  position:sticky;top:0;z-index:30;height:56px;padding:0 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--line);background:rgba(255,255,255,.94);
+  backdrop-filter:blur(14px);box-shadow:0 8px 22px rgba(16,24,40,.04);
+}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{
+  width:34px;height:34px;border-radius:8px;display:grid;place-items:center;
+  background:var(--teal-soft);border:1px solid var(--line);color:var(--teal);
+  font-size:16px;font-weight:900;
+}
+.logo-text{font-size:15px;font-weight:900;color:var(--ink);}
+.logo-sub{font-size:10px;color:var(--muted);font-family:Menlo,Consolas,monospace;}
+.top-meta{font-size:11px;color:var(--muted);font-family:Menlo,Consolas,monospace;}
+.tabs{
+  position:sticky;top:56px;z-index:20;display:flex;justify-content:center;gap:8px;
+  padding:8px 28px;background:#fff;border-bottom:1px solid var(--line);
+}
+.tab{
+  flex:0 1 230px;min-height:42px;padding:9px 16px;border:1px solid transparent;
+  border-radius:8px;display:flex;align-items:center;justify-content:center;gap:8px;
+  color:var(--muted);font-size:13px;font-weight:900;cursor:pointer;transition:.15s;
+}
+.tab:hover{border-color:var(--line);background:var(--teal-soft);color:var(--teal);}
+.tab.active{border-color:var(--teal);background:var(--teal);color:#fff;}
+.badge{padding:2px 7px;border-radius:999px;background:#f1f5f9;color:var(--muted);font-size:10px;font-weight:900;}
+.tab.active .badge{background:rgba(255,255,255,.2);color:#fff;}
+.demo-note{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.42fr);
+  gap:16px;align-items:center;margin:18px 28px 0;padding:16px 18px;
+  border:1px solid var(--line);border-radius:8px;background:var(--teal-soft);
+  box-shadow:var(--shadow-soft);
+}
+.demo-note-label{display:inline-flex;margin-bottom:6px;color:var(--teal);font-size:12px;font-weight:900;}
+.demo-note h1{font-size:19px;line-height:1.35;letter-spacing:0;}
+.demo-note p{margin-top:6px;color:#2e4a6e;font-size:13px;line-height:1.75;}
+.demo-note-list{display:grid;gap:7px;list-style:none;}
+.demo-note-list li{position:relative;padding-left:16px;color:#2e4a6e;font-size:12px;font-weight:800;}
+.demo-note-list li::before{content:"";position:absolute;left:0;top:.7em;width:6px;height:6px;border-radius:999px;background:var(--teal);}
+.demo-caution{grid-column:1/-1;margin:0;padding-top:10px;border-top:1px solid rgba(29,78,216,.14);color:var(--muted);font-size:11px;}
+.module{display:none;padding-bottom:28px;}
+.module.active{display:block;}
+.sec-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:22px 28px 0;margin-bottom:16px;}
+.sec-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:900;}
+.sec-title::before{content:"";width:4px;height:18px;border-radius:2px;background:var(--teal);}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;}
+.filter-select,.btn{
+  min-height:36px;padding:7px 12px;border:1px solid var(--line);border-radius:8px;
+  background:#fff;color:var(--muted);font:800 12px/1.2 inherit;cursor:pointer;
+}
+.btn.primary{border-color:var(--teal);background:var(--teal);color:#fff;}
+.btn.amber{border-color:var(--amber);background:var(--amber);color:#fff;}
+.pad{padding:0 28px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.card{
+  background:#fff;border:1px solid var(--line);border-radius:8px;padding:18px;
+  box-shadow:var(--shadow);
+}
+.card.wide{grid-column:1/-1;}
+.card-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;font-size:13px;font-weight:900;}
+.card-label{font-size:11px;font-weight:900;color:var(--teal);}
+.kpi-val{margin-top:8px;font-size:29px;line-height:1;font-weight:900;}
+.kpi-unit{font-size:13px;font-weight:500;color:var(--muted);}
+.kpi-sub{margin-top:5px;font-size:11px;color:var(--muted);}
+.delta-up{color:var(--green);font-weight:900;}
+.delta-dn{color:var(--red);font-weight:900;}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.tbl th{padding:8px 10px;background:var(--soft);color:#344054;font-size:10px;text-align:left;font-weight:900;border-bottom:1px solid var(--line);}
+.tbl td{padding:9px 10px;border-bottom:1px solid var(--line);}
+.tbl tr:last-child td{border-bottom:0;}
+.pill{display:inline-flex;align-items:center;min-height:22px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:900;}
+.pill.green{background:#e8f5e9;color:var(--green);}
+.pill.blue{background:#e3eef8;color:#0b73b7;}
+.pill.amber{background:#fff3e0;color:var(--amber);}
+.pill.gray{background:#f1f5f9;color:var(--muted);}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.bar-row:last-child{margin-bottom:0;}
+.bar-lbl{width:92px;text-align:right;flex-shrink:0;color:var(--muted);font-size:11px;}
+.bar-track{height:17px;flex:1;border-radius:5px;background:#edf2ff;overflow:hidden;}
+.bar-fill{height:100%;display:flex;align-items:center;padding-left:7px;border-radius:4px;color:#fff;font-size:10px;font-weight:900;}
+.bar-val{width:52px;text-align:right;color:var(--muted);font-size:11px;}
+.mini-note{margin-top:12px;padding:12px;border-radius:8px;background:#f5f8ff;border:1px solid #bfdbfe;color:#2e4a6e;font-size:12px;}
+.workflow{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.workflow li{
+  list-style:none;min-height:92px;padding:12px;border:1px solid var(--line);border-radius:8px;background:#fff;
+}
+.workflow span{display:grid;width:24px;height:24px;place-items:center;border-radius:999px;background:var(--teal-soft);color:var(--teal);font-size:11px;font-weight:900;}
+.workflow strong{display:block;margin-top:8px;font-size:13px;}
+.workflow p{margin-top:4px;color:var(--muted);font-size:11px;}
+.plan-list{display:grid;gap:10px;}
+.plan-row{
+  display:grid;grid-template-columns:110px 1fr 110px 90px;gap:12px;align-items:center;
+  padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:#fff;
+}
+.plan-title{font-weight:900;font-size:12px;}
+.plan-sub{color:var(--muted);font-size:11px;}
+.small{font-size:11px;color:var(--muted);}
+@media(max-width:920px){
+  .demo-note,.grid2,.grid3,.grid4,.workflow{grid-template-columns:1fr;}
+  .plan-row{grid-template-columns:1fr;}
+}
+@media(max-width:680px){
+  .top-header{height:auto;align-items:flex-start;flex-direction:column;padding:12px 18px;gap:8px;}
+  .tabs{position:static;flex-direction:column;padding:8px 18px;}
+  .demo-note,.sec-header,.pad{margin-left:18px;margin-right:18px;padding-left:0;padding-right:0;}
+  .demo-note{padding:14px;}
+}
+</style>
+</head>
+<body>
+<header class="top-header">
+  <div class="logo">
+    <div class="logo-icon">M</div>
+    <div>
+      <div class="logo-text">販促活動ダッシュボード</div>
+      <div class="logo-sub"><a href="../../" style="color:inherit;text-decoration:none">Back to Top</a></div>
+    </div>
+  </div>
+  <div class="top-meta">Sample Data</div>
+</header>
+
+<nav class="tabs">
+  <div class="tab active" onclick="switchModule('record')">📝 受付記録 <span class="badge">LOG</span></div>
+  <div class="tab" onclick="switchModule('analysis')">📊 分析 <span class="badge">DATA</span></div>
+  <div class="tab" onclick="switchModule('plan')">📅 次アクション <span class="badge">PLAN</span></div>
+</nav>
+
+<section class="demo-note" aria-label="概要">
+  <div>
+    <span class="demo-note-label">Marketing Activity Dashboard</span>
+    <h1>問い合わせ・資料請求・展示会フォローの統合管理画面</h1>
+    <p>
+      流入元・関心テーマ・対応状況を記録・分析し、FAQ・製品ページの改善施策へつなげます。
+    </p>
+  </div>
+  <ul class="demo-note-list">
+    <li>受付・分析・次アクションを一画面に集約</li>
+    <li>スプレッドシート連携で低コスト運用</li>
+    <li>コンテンツ改善の優先度を可視化</li>
+  </ul>
+  <p class="demo-caution">* サンプルデータを使用しています。</p>
+</section>
+
+<div id="mod-record" class="module active">
+  <div class="sec-header">
+    <div class="sec-title">今日の受付・フォロー状況（サンプル日）</div>
+    <div class="filter-row">
+      <select class="filter-select"><option>全チャネル</option><option>Web問い合わせ</option><option>資料請求</option><option>展示会</option></select>
+      <button class="btn primary">＋ 記録追加</button>
+    </div>
+  </div>
+  <div class="pad">
+    <div class="grid4" style="margin-bottom:18px;">
+      <div class="card">
+        <div class="card-label">本日の受付件数</div>
+        <div class="kpi-val">36<span class="kpi-unit">件</span></div>
+        <div class="kpi-sub"><span class="delta-up">▲ +8</span> 前日比</div>
+      </div>
+      <div class="card">
+        <div class="card-label">一次返信済み</div>
+        <div class="kpi-val">29<span class="kpi-unit">件</span></div>
+        <div class="kpi-sub">未返信 7件</div>
+      </div>
+      <div class="card">
+        <div class="card-label">資料送付</div>
+        <div class="kpi-val">18<span class="kpi-unit">件</span></div>
+        <div class="kpi-sub">うち製品資料 12件</div>
+      </div>
+      <div class="card">
+        <div class="card-label">要フォロー</div>
+        <div class="kpi-val">11<span class="kpi-unit">件</span></div>
+        <div class="kpi-sub"><span class="delta-dn">▼ 優先確認</span></div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">チャネル別 受付状況</div>
+        <div class="bar-row"><div class="bar-lbl">Web問い合わせ</div><div class="bar-track"><div class="bar-fill" style="width:72%;background:var(--teal);">16件</div></div><div class="bar-val">16件</div></div>
+        <div class="bar-row"><div class="bar-lbl">資料請求</div><div class="bar-track"><div class="bar-fill" style="width:58%;background:var(--green);">13件</div></div><div class="bar-val">13件</div></div>
+        <div class="bar-row"><div class="bar-lbl">展示会後</div><div class="bar-track"><div class="bar-fill" style="width:31%;background:var(--amber);">7件</div></div><div class="bar-val">7件</div></div>
+        <div class="mini-note">問い合わせ内容を分類しておくことで、FAQや製品ページに追加すべき情報を拾いやすくします。</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">本日の受付ログ</div>
+        <table class="tbl">
+          <thead><tr><th>時刻</th><th>チャネル</th><th>関心テーマ</th><th>状況</th></tr></thead>
+          <tbody>
+            <tr><td>09:20</td><td>Web問い合わせ</td><td>製品A 比較</td><td><span class="pill blue">確認中</span></td></tr>
+            <tr><td>10:05</td><td>資料請求</td><td>導入事例</td><td><span class="pill green">送付済</span></td></tr>
+            <tr><td>10:40</td><td>展示会後</td><td>デモ希望</td><td><span class="pill amber">要日程調整</span></td></tr>
+            <tr><td>11:15</td><td>Web問い合わせ</td><td>仕様確認</td><td><span class="pill blue">担当確認</span></td></tr>
+            <tr><td>13:10</td><td>資料請求</td><td>価格帯</td><td><span class="pill green">一次返信</span></td></tr>
+            <tr><td>14:30</td><td>Web問い合わせ</td><td>FAQ不足</td><td><span class="pill gray">下書き中</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">よく出た関心テーマ</div>
+        <table class="tbl">
+          <thead><tr><th>テーマ</th><th>件数</th><th>改善候補</th></tr></thead>
+          <tbody>
+            <tr><td>製品A・製品Bの違い</td><td>9</td><td>比較表を追加</td></tr>
+            <tr><td>導入事例</td><td>7</td><td>事例ページへの導線強化</td></tr>
+            <tr><td>初期費用の目安</td><td>6</td><td>FAQに追記</td></tr>
+            <tr><td>資料ダウンロード方法</td><td>5</td><td>フォーム文言を調整</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">対応テンプレート候補</div>
+        <table class="tbl">
+          <thead><tr><th>用途</th><th>状態</th><th>担当</th></tr></thead>
+          <tbody>
+            <tr><td>資料送付後のお礼</td><td><span class="pill green">使用可</span></td><td>担当A</td></tr>
+            <tr><td>仕様確認の一次返信</td><td><span class="pill blue">確認中</span></td><td>担当B</td></tr>
+            <tr><td>展示会後フォロー</td><td><span class="pill amber">調整中</span></td><td>担当C</td></tr>
+            <tr><td>FAQ誘導文</td><td><span class="pill gray">下書き</span></td><td>担当A</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="mod-analysis" class="module">
+  <div class="sec-header">
+    <div class="sec-title">販促施策の分析（サンプル月）</div>
+    <div class="filter-row">
+      <select class="filter-select"><option>今月</option><option>前月</option><option>四半期</option></select>
+      <select class="filter-select"><option>全テーマ</option><option>製品A</option><option>導入事例</option><option>FAQ</option></select>
+    </div>
+  </div>
+  <div class="pad">
+    <div class="grid2">
+      <div class="card wide">
+        <div class="card-title">チャネル別 実績推移</div>
+        <table class="tbl">
+          <thead><tr><th>チャネル</th><th>今月</th><th>前月</th><th>対比</th><th>主な示唆</th></tr></thead>
+          <tbody>
+            <tr><td>Web問い合わせ</td><td>142件</td><td>118件</td><td class="delta-up">+20%</td><td>比較ページ経由が増加</td></tr>
+            <tr><td>資料請求</td><td>96件</td><td>88件</td><td class="delta-up">+9%</td><td>導入事例からの流入が安定</td></tr>
+            <tr><td>展示会後フォロー</td><td>54件</td><td>20件</td><td class="delta-up">+170%</td><td>会期後の対応集中</td></tr>
+            <tr><td>FAQ閲覧後の問い合わせ</td><td>31件</td><td>42件</td><td class="delta-dn">-26%</td><td>FAQ改善で自己解決が増えた可能性</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">コンテンツ改善候補</div>
+        <div class="bar-row"><div class="bar-lbl">比較表</div><div class="bar-track"><div class="bar-fill" style="width:82%;background:var(--teal);">高</div></div><div class="bar-val">18件</div></div>
+        <div class="bar-row"><div class="bar-lbl">FAQ</div><div class="bar-track"><div class="bar-fill" style="width:68%;background:var(--green);">中高</div></div><div class="bar-val">15件</div></div>
+        <div class="bar-row"><div class="bar-lbl">導入事例</div><div class="bar-track"><div class="bar-fill" style="width:54%;background:var(--blue);">中</div></div><div class="bar-val">12件</div></div>
+        <div class="bar-row"><div class="bar-lbl">フォーム文言</div><div class="bar-track"><div class="bar-fill" style="width:36%;background:var(--amber);">確認</div></div><div class="bar-val">8件</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">対応状況サマリー</div>
+        <table class="tbl">
+          <thead><tr><th>状態</th><th>件数</th><th>次の確認</th></tr></thead>
+          <tbody>
+            <tr><td><span class="pill green">完了</span></td><td>186</td><td>テンプレート反映</td></tr>
+            <tr><td><span class="pill blue">確認中</span></td><td>44</td><td>担当部署へ確認</td></tr>
+            <tr><td><span class="pill amber">要フォロー</span></td><td>21</td><td>日程候補を送付</td></tr>
+            <tr><td><span class="pill gray">保留</span></td><td>9</td><td>情報不足の確認</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="mod-plan" class="module">
+  <div class="sec-header">
+    <div class="sec-title">次アクション計画</div>
+    <div class="filter-row">
+      <button class="btn primary">＋ 改善タスク追加</button>
+      <button class="btn amber">下書き出力</button>
+    </div>
+  </div>
+  <div class="pad">
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">販促改善の進め方</div>
+        <ol class="workflow">
+          <li><span>1</span><strong>受付</strong><p>問い合わせや資料請求を記録する。</p></li>
+          <li><span>2</span><strong>分類</strong><p>関心テーマと流入元をそろえる。</p></li>
+          <li><span>3</span><strong>分析</strong><p>よくある質問や不足情報を見る。</p></li>
+          <li><span>4</span><strong>改善</strong><p>FAQ、資料、フォーム文言へ反映。</p></li>
+          <li><span>5</span><strong>確認</strong><p>次月の問い合わせ傾向を見る。</p></li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <div class="card-title">今週の改善タスク</div>
+        <div class="plan-list">
+          <div class="plan-row">
+            <div><div class="plan-title">FAQ追記</div><div class="plan-sub">製品A比較</div></div>
+            <div class="small">問い合わせが多い比較ポイントを3項目に整理。</div>
+            <div><span class="pill blue">確認中</span></div>
+            <div class="small">担当A</div>
+          </div>
+          <div class="plan-row">
+            <div><div class="plan-title">資料導線</div><div class="plan-sub">導入事例</div></div>
+            <div class="small">資料請求ボタンの位置と文言を見直す。</div>
+            <div><span class="pill amber">下書き</span></div>
+            <div class="small">担当B</div>
+          </div>
+          <div class="plan-row">
+            <div><div class="plan-title">フォロー文</div><div class="plan-sub">展示会後</div></div>
+            <div class="small">展示会後のお礼と日程調整メールを標準化。</div>
+            <div><span class="pill green">使用可</span></div>
+            <div class="small">担当C</div>
+          </div>
+          <div class="plan-row">
+            <div><div class="plan-title">比較ページ</div><div class="plan-sub">製品A/B</div></div>
+            <div class="small">問い合わせ前に確認できる表を作る。</div>
+            <div><span class="pill gray">未着手</span></div>
+            <div class="small">担当A</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card wide">
+        <div class="card-title">改善メモ（サンプル）</div>
+        <table class="tbl">
+          <thead><tr><th>気づき</th><th>想定する反映先</th><th>効果確認</th></tr></thead>
+          <tbody>
+            <tr><td>製品比較の問い合わせが増えている</td><td>比較ページ・FAQ</td><td>同じ質問の件数推移を見る</td></tr>
+            <tr><td>展示会後のフォローが担当者ごとに分かれやすい</td><td>メールテンプレート・管理表</td><td>一次返信までの日数を見る</td></tr>
+            <tr><td>資料請求後の次アクションが見えづらい</td><td>管理画面・ステータス分類</td><td>要フォロー件数を見る</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchModule(id){
+  document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('mod-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+</script>
+</body>
+</html>

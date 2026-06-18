@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>サンプル書類</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: #f1f4f8;
+  color: #1a2332;
+}
+.paper {
+  width: min(720px, 100%);
+  min-height: 540px;
+  padding: 48px;
+  border: 1px solid #dce3ed;
+  background: #fff;
+  box-shadow: 0 20px 48px rgba(29,78,216,.08);
+}
+.label {
+  display: inline-flex;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 800;
+}
+h1 { margin: 24px 0 8px; font-size: 34px; }
+p { color: #5d6b82; line-height: 1.8; }
+.box {
+  margin-top: 30px;
+  padding: 20px;
+  border: 1px solid #dce3ed;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+a { color: #1d4ed8; font-weight: 800; }
+</style>
+</head>
+<body>
+<main class="paper">
+  <div class="label">WEBサンプル書類</div>
+  <h1 id="title">依頼書PDF</h1>
+  <p>このページは、PDFリンクのクリック先として用意したサンプル書類です。実際のPDF生成、Drive保存、メール送信は行いません。</p>
+  <div class="box">
+  <p><b>依頼ID:</b> <span id="orderId"></span></p>
+    <p><b>種別:</b> <span id="docType"></span></p>
+  </div>
+  <p><a id="adminLink" href="05_admin.html">管理画面に戻る</a></p>
+</main>
+<script>
+function orderSystemPath(file) {
+  const marker = '/demos/order_system/';
+  const path = window.location.pathname;
+  const index = path.indexOf(marker);
+  const base = index >= 0 ? path.slice(0, index + marker.length) : './';
+  return base + file;
+}
+const params = new URLSearchParams(window.location.search);
+const type = params.get('type') === 'delivery' ? '確認書' : '依頼書PDF';
+document.getElementById('title').textContent = type;
+document.getElementById('docType').textContent = type;
+document.getElementById('orderId').textContent = params.get('id') || 'OP-DEMO';
+document.getElementById('adminLink').href = orderSystemPath('05_admin.html');
+</script>
+</body>
+</html>

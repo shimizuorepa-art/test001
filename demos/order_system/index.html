@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Management | Web Application Samples</title>
+    <link rel="stylesheet" href="../tokens.css" />
+    <style>
+      .shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+      main { padding: 36px 0 52px; }
+
+      .hero,
+      .panel,
+      .card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        background: var(--paper);
+        box-shadow: var(--shadow);
+      }
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 300px;
+        gap: 22px;
+        padding: clamp(24px, 4vw, 40px);
+      }
+      .eyebrow {
+        display: inline-flex;
+        margin-bottom: 14px;
+        padding: 6px 12px;
+        border-radius: var(--radius-pill);
+        background: var(--amber-soft);
+        color: var(--amber);
+        font-size: 12px;
+        font-weight: 800;
+      }
+      h1 {
+        max-width: 760px;
+        font-size: clamp(26px, 4vw, 42px);
+        line-height: 1.18;
+        letter-spacing: -0.01em;
+      }
+      .lead {
+        max-width: 680px;
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.7;
+      }
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 22px;
+      }
+      .side {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .hero-illustration {
+        width: 100%;
+        max-width: 280px;
+        height: auto;
+        opacity: .85;
+        filter: drop-shadow(0 8px 24px rgba(29,78,216,.12));
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+      .card {
+        padding: 20px;
+        transition: box-shadow 0.2s, transform 0.2s;
+      }
+      .card:hover {
+        box-shadow: var(--shadow-hover);
+        transform: translateY(-2px);
+      }
+      .tag {
+        display: inline-flex;
+        padding: 4px 10px;
+        border-radius: var(--radius-pill);
+        background: var(--teal-soft);
+        color: var(--teal);
+        font-size: 11px;
+        font-weight: 800;
+      }
+      .card h2 { margin-top: 10px; font-size: 20px; line-height: 1.3; }
+      .card p { margin-top: 8px; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+
+      .panel {
+        margin-top: 18px;
+        padding: 22px;
+      }
+      .panel h2 { font-size: 20px; }
+      .panel ul {
+        display: grid;
+        gap: 8px;
+        margin: 12px 0 0;
+        padding-left: 18px;
+        color: #344054;
+        font-size: 14px;
+      }
+      .panel .note {
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        min-height: 38px;
+        padding: 8px 14px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: #fff;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: border-color 0.15s, color 0.15s, background 0.15s;
+      }
+      .button:hover { border-color: var(--accent); color: var(--accent); }
+      .button.primary { border-color: var(--accent); background: var(--accent); color: #fff; }
+      .button.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+      @media (max-width: 880px) {
+        .hero, .grid { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="g-nav">
+      <div class="shell g-nav-inner">
+        <a class="g-brand" href="../../">
+          <span class="g-brand-mark">YS</span>
+          <span>Web Application Samples</span>
+        </a>
+        <a class="g-back" href="../../">Back to Top</a>
+      </div>
+    </nav>
+    <main>
+      <div class="shell">
+        <section class="hero">
+          <div>
+            <span class="eyebrow">Order Management</span>
+            <h1>受付業務の入力・管理・履歴画面</h1>
+            <p class="lead">
+              受付フォーム・管理画面・履歴参照の3画面構成。スプレッドシート連携で段階的に導入できる設計です。
+            </p>
+            <div class="hero-actions">
+              <a class="button primary" href="05_admin.html">Admin</a>
+              <a class="button" href="04_index.html">Input Form</a>
+              <a class="button" href="06_history.html">History</a>
+            </div>
+          </div>
+          <aside class="side">
+            <img class="hero-illustration" src="hero-illustration.svg" alt="Data input illustration" width="280" height="294">
+          </aside>
+        </section>
+
+        <section class="grid" aria-label="Screen list">
+          <article class="card">
+            <span class="tag">ADMIN</span>
+            <h2>管理者画面</h2>
+            <p>受付一覧の確認・振り分け・編集を行う管理画面。</p>
+            <div style="margin-top:14px"><a class="button primary" href="05_admin.html">Open</a></div>
+          </article>
+          <article class="card">
+            <span class="tag">FORM</span>
+            <h2>入力フォーム</h2>
+            <p>依頼内容を登録する入力画面。</p>
+            <div style="margin-top:14px"><a class="button primary" href="04_index.html">Open</a></div>
+          </article>
+          <article class="card">
+            <span class="tag">HISTORY</span>
+            <h2>履歴参照</h2>
+            <p>過去の依頼・ステータス・書類を確認する画面。</p>
+            <div style="margin-top:14px"><a class="button primary" href="06_history.html">Open</a></div>
+          </article>
+        </section>
+
+        <section class="panel">
+          <h2>Features</h2>
+          <ul>
+            <li>既存の紙・Excel運用を否定せず、段階的に電子化</li>
+            <li>入力・管理・履歴を役割別に分離して設計</li>
+            <li>テスト運用で業務ルールを固め、本実装へ引き継ぎ</li>
+          </ul>
+          <p class="note">サンプルデータはブラウザ内に保持。実顧客情報は含みません。</p>
+        </section>
+      </div>
+    </main>
+    <footer class="g-footer">Y. Shimizu / Web Application Samples</footer>
+  </body>
+</html>
