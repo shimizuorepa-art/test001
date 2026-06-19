@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-labelledby="title desc">
+  <title id="title">販促LP・SEO導線</title>
+  <desc id="desc">販促LPとSEO・回遊導線設計のサムネイル</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#081526"/>
+      <stop offset="0.5" stop-color="#10283d"/>
+      <stop offset="1" stop-color="#22142d"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="520" fill="url(#bg)"/>
+  <g transform="translate(98 78)">
+    <rect width="330" height="354" rx="24" fill="#0d1c2c" stroke="#3b82f6" stroke-opacity=".56"/>
+    <rect x="34" y="38" width="210" height="28" rx="8" fill="#f7fbff"/>
+    <rect x="34" y="92" width="260" height="16" rx="8" fill="#a7b7c7" opacity=".7"/>
+    <rect x="34" y="128" width="214" height="16" rx="8" fill="#a7b7c7" opacity=".44"/>
+    <rect x="34" y="184" width="112" height="112" rx="18" fill="#14c78d" opacity=".22" stroke="#14c78d"/>
+    <rect x="172" y="196" width="102" height="20" rx="10" fill="#14c78d"/>
+    <rect x="172" y="240" width="86" height="12" rx="6" fill="#a7b7c7"/>
+    <rect x="172" y="270" width="102" height="12" rx="6" fill="#a7b7c7" opacity=".5"/>
+  </g>
+  <g transform="translate(510 118)" font-family="Inter, system-ui, sans-serif">
+    <rect width="270" height="250" rx="24" fill="#132235" stroke="#14c78d" stroke-opacity=".5"/>
+    <text x="38" y="58" font-size="22" font-weight="900" fill="#f7fbff">SEO / Flow</text>
+    <path d="M62 112h150M62 160h150M62 208h150" stroke="#14c78d" stroke-width="10" stroke-linecap="round"/>
+    <path d="m204 112 28 24-28 24M204 160l28 24-28 24" fill="none" stroke="#3b82f6" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="450" y="462" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="900" fill="#f7fbff">LP / Internal Links / 180k PV</text>
+</svg>

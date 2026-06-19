@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-labelledby="title desc">
+  <title id="title">Web運用・保守更新</title>
+  <desc id="desc">WordPressやWebページの運用・保守更新を表すサムネイル</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07111f"/>
+      <stop offset="0.55" stop-color="#122b45"/>
+      <stop offset="1" stop-color="#10201d"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="520" fill="url(#bg)"/>
+  <g transform="translate(104 96)">
+    <rect width="390" height="300" rx="24" fill="#f7fbff" filter="drop-shadow(0 24px 34px rgba(0,0,0,.38))"/>
+    <rect width="390" height="58" rx="24" fill="#21759b"/>
+    <text x="34" y="38" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="900" fill="#fff">WordPress / Web Ops</text>
+    <circle cx="76" cy="142" r="46" fill="#21759b"/>
+    <text x="76" y="158" text-anchor="middle" font-family="Georgia, serif" font-size="54" font-weight="900" fill="#fff">W</text>
+    <rect x="150" y="112" width="178" height="20" rx="10" fill="#132235"/>
+    <rect x="150" y="154" width="136" height="14" rx="7" fill="#132235" opacity=".45"/>
+    <rect x="48" y="230" width="282" height="44" rx="14" fill="#eaf1f7"/>
+  </g>
+  <g transform="translate(554 132)" font-family="Inter, system-ui, sans-serif">
+    <rect width="238" height="230" rx="24" fill="#0d1c2c" stroke="#14c78d" stroke-opacity=".58"/>
+    <text x="32" y="54" font-size="22" font-weight="900" fill="#f7fbff">Maintenance</text>
+    <path d="M50 104h104M50 146h142M50 188h86" stroke="#a7b7c7" stroke-width="12" stroke-linecap="round" opacity=".58"/>
+    <circle cx="190" cy="104" r="20" fill="#14c78d"/>
+    <path d="m181 104 7 7 15-18" fill="none" stroke="#07111f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
