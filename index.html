@@ -396,6 +396,12 @@
         object-fit: cover;
         object-position: left top;
       }
+      .thumb img.fit-contain {
+        object-fit: contain;
+        object-position: center;
+        padding: 6px;
+        background: #0f1c2f;
+      }
       .work-body { padding: 18px; }
       .work-body h3 {
         color: var(--text);
@@ -420,6 +426,25 @@
         color: var(--accent);
         font-size: 11px;
         font-weight: 800;
+      }
+      #works .works-grid {
+        gap: 12px;
+        margin-top: 14px;
+      }
+      #works .thumb { height: 118px; }
+      #works .work-body { padding: 12px; }
+      #works .work-body h3 { font-size: 15px; }
+      #works .work-body p {
+        font-size: 11.5px;
+        line-height: 1.55;
+      }
+      #works .work-meta {
+        gap: 6px;
+        margin-top: 9px;
+      }
+      #works .tag {
+        padding: 2px 7px;
+        font-size: 10px;
       }
 
       .skill-layout {
@@ -756,6 +781,43 @@
         .proof-card h3 { font-size: 12pt; }
         .proof-card strong { font-size: 12pt; }
         .proof-card p { font-size: 8.5pt; }
+        #works.slide { padding: 14mm 18mm 13mm; }
+        #works .slide-head {
+          margin-bottom: 6mm;
+          padding-bottom: 4mm;
+        }
+        #works h2 { font-size: 19pt; }
+        #works .lead {
+          max-width: none;
+          font-size: 9.3pt;
+          line-height: 1.55;
+        }
+        #works .works-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 3mm;
+          margin-top: 3mm;
+        }
+        #works .thumb { height: 20mm; }
+        #works .thumb img.fit-contain { padding: 1.5mm; }
+        #works .work-body { padding: 3.5mm; }
+        #works .work-body h3 {
+          font-size: 10.5pt;
+          line-height: 1.25;
+        }
+        #works .work-body p {
+          margin-top: 1.5mm;
+          font-size: 7.2pt;
+          line-height: 1.45;
+        }
+        #works .work-meta {
+          gap: 1.5mm;
+          margin-top: 2.4mm;
+        }
+        #works .tag {
+          border-radius: 1.5mm;
+          padding: 0.8mm 1.8mm;
+          font-size: 6.8pt;
+        }
         .motion-ready .slide,
         .motion-ready .slide-head,
         .motion-ready .cover-title .title-main,
@@ -917,52 +979,52 @@
         <h2 id="works-title">代表実績</h2>
         <p class="lead">POP作成3点、WEB制作3点。制作チームと共同で形にし、担当部門との調整から販売促進の見せ方までディレクションしていました。</p>
         <div class="works-grid">
-          <a class="work-card" href="https://app.notion.com/p/347889f871ee8038a14df4b074294465">
-            <div class="thumb"><img src="assets/thumb-pop-floor-campaign.svg" alt="食品フロア企画POPの制作イメージ" /></div>
+          <a class="work-card" href="https://app.notion.com/p/347889f871ee8038a14df4b074294465#347889f871ee814cb70fcb1f946a18de">
+            <div class="thumb"><img class="fit-contain" src="assets/notion/oseibo-2023.png" alt="2023年 三越のお歳暮 大型看板" /></div>
             <div class="work-body">
-              <h3>食品フロア企画POP</h3>
-              <p>担当部門と訴求軸をすり合わせ、制作チームとビジュアルを調整。店頭で伝わる見出しと導線を設計。</p>
-              <div class="work-meta"><span class="tag">POP</span><span class="tag">販促ディレクション</span></div>
+              <h3>2023年 三越のお歳暮</h3>
+              <p>カタログ、WEBと印象を揃えた大型看板を制作。担当部門の要望を整理し、訴求情報の見せ方を調整。</p>
+              <div class="work-meta"><span class="tag">大型POP</span><span class="tag">Illustrator</span></div>
             </div>
           </a>
-          <a class="work-card" href="https://app.notion.com/p/347889f871ee8038a14df4b074294465">
-            <div class="thumb"><img src="assets/thumb-pop-store-display.svg" alt="館内装飾と大型POPの制作イメージ" /></div>
+          <a class="work-card" href="https://app.notion.com/p/347889f871ee8038a14df4b074294465#347889f871ee811baa84e9c768c9b7fc">
+            <div class="thumb"><img class="fit-contain" src="assets/notion/temiyage-2023.png" alt="ゴールデンウイーク TEMIYAGE 大型POP" /></div>
             <div class="work-body">
-              <h3>館内装飾・大型POP</h3>
-              <p>売場の見え方、掲出場所、優先情報を整理。制作依頼から確認戻しまで進行し、販促面の品質を管理。</p>
-              <div class="work-meta"><span class="tag">店頭装飾</span><span class="tag">制作進行</span></div>
+              <h3>ゴールデンウイーク TEMIYAGE</h3>
+              <p>食品フロアの手土産需要に合わせ、商品情報の整理と構成を担当。POPスタジオと共同で店頭導線を設計。</p>
+              <div class="work-meta"><span class="tag">販促企画</span><span class="tag">制作進行</span></div>
             </div>
           </a>
-          <a class="work-card" href="https://app.notion.com/p/347889f871ee8038a14df4b074294465">
-            <div class="thumb"><img src="assets/thumb-pop-flyer-thumbnail.svg" alt="A4フライヤーとサムネイルの制作イメージ" /></div>
+          <a class="work-card" href="https://app.notion.com/p/347889f871ee8038a14df4b074294465#347889f871ee81079ed9db5743b0bf11">
+            <div class="thumb"><img class="fit-contain" src="assets/notion/sweets-2023.png" alt="初夏のスイーツ特集 POP" /></div>
             <div class="work-body">
-              <h3>A4フライヤー・サムネイル</h3>
-              <p>配布、掲出、WEB掲載それぞれの用途に合わせ、情報量と見え方を調整。販促素材のトーンを統一。</p>
-              <div class="work-meta"><span class="tag">DTP</span><span class="tag">サムネイル</span></div>
+              <h3>初夏のスイーツ特集</h3>
+              <p>販売計画、促進、食料品担当部門と起案。POP制作とLP制作をつなぎ、店頭とWEBの見え方を統一。</p>
+              <div class="work-meta"><span class="tag">POP+LP</span><span class="tag">部門調整</span></div>
             </div>
           </a>
-          <a class="work-card" href="https://www.mitsukoshi.mistore.jp/hoshigaoka.html">
-            <div class="thumb"><img src="assets/thumb-web-page-update.svg" alt="Webページ更新の制作イメージ" /></div>
+          <a class="work-card" href="https://www.mitsukoshi.mistore.jp/hoshigaoka/event_calendar/Hari-Tatsuo.html">
+            <div class="thumb"><img class="fit-contain" src="assets/notion/hari-tatsuo-2023.jpg" alt="はりたつお展 WEBページ サムネイル" /></div>
             <div class="work-body">
-              <h3>名古屋三越 WEBページ更新</h3>
-              <p>販促企画に合わせて掲載内容、画像、導線を整理。制作チームと連携し、店頭施策とWEBを連動。</p>
-              <div class="work-meta"><span class="tag">WEB更新</span><span class="tag">部門調整</span></div>
+              <h3>はりたつお展 LP</h3>
+              <p>催事場イベントの世界観に合わせてページイメージを調整。集客施策として見出し、画像、導線を構成。</p>
+              <div class="work-meta"><span class="tag">LP</span><span class="tag">AEM</span></div>
             </div>
           </a>
-          <a class="work-card" href="https://app.notion.com/p/347889f871ee8038a14df4b074294465">
-            <div class="thumb"><img src="assets/thumb-web-lp-seo.svg" alt="販促LPとSEO導線の制作イメージ" /></div>
+          <a class="work-card" href="https://www.mitsukoshi.mistore.jp/hoshigaoka/shops/women/fashion4f/shopnews_list/preciousweek/2024_0416.html">
+            <div class="thumb"><img class="fit-contain" src="assets/notion/precious-week-2024.png" alt="プレシャスウイーク WEBページ サムネイル" /></div>
             <div class="work-body">
-              <h3>販促LP・回遊導線</h3>
-              <p>大型施策でLP制作、見出し、内部リンク、ページ導線を調整。販売促進の目的に合わせた見せ方を設計。</p>
-              <div class="work-meta"><span class="tag">LP</span><span class="tag">SEO/導線</span></div>
+              <h3>プレシャスウイーク</h3>
+              <p>婦人ファッションの上位顧客向け情報を配信。ターゲットに合わせたビジュアルと訴求整理で購買を促進。</p>
+              <div class="work-meta"><span class="tag">WEB販促</span><span class="tag">サムネイル</span></div>
             </div>
           </a>
-          <a class="work-card" href="https://app.notion.com/p/347889f871ee8038a14df4b074294465">
-            <div class="thumb"><img src="assets/thumb-web-maintenance.svg" alt="Web運用と保守更新の制作イメージ" /></div>
+          <a class="work-card" href="https://www.mitsukoshi.mistore.jp/hoshigaoka/shops/beauty/cosmetics/shopnews_list/cosmetic-event/02.html">
+            <div class="thumb"><img class="fit-contain" src="assets/notion/foundation-2024.jpg" alt="春のファンデーション特集 WEBページ サムネイル" /></div>
             <div class="work-body">
-              <h3>WEB運用・保守更新</h3>
-              <p>WEB掲載後の修正、情報更新、問い合わせ起点の改善に対応。WordPress運用経験も活かし、保守目線で管理。</p>
-              <div class="work-meta"><span class="tag">WEB保守</span><span class="tag">WordPress</span></div>
+              <h3>春のファンデーション特集</h3>
+              <p>コスメ施策の訴求を若年層にも届くトーンで構成。既存媒体との統一感を保ちながらWEB掲載用に調整。</p>
+              <div class="work-meta"><span class="tag">WEB更新</span><span class="tag">販促導線</span></div>
             </div>
           </a>
         </div>
