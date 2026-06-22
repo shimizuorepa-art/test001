@@ -343,6 +343,9 @@
         gap: 14px;
         margin-top: 34px;
       }
+      .proof-grid.three-up {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
       .proof-card {
         min-height: 176px;
         border: 1px solid var(--line2);
@@ -469,10 +472,10 @@
         aspect-ratio: 1;
         border-radius: 50%;
         background: conic-gradient(
-          var(--accent) 0 calc(108deg * var(--skill-progress)),
-          var(--accent2) calc(108deg * var(--skill-progress)) calc(216deg * var(--skill-progress)),
-          var(--violet) calc(216deg * var(--skill-progress)) calc(306deg * var(--skill-progress)),
-          var(--amber) calc(306deg * var(--skill-progress)) calc(360deg * var(--skill-progress)),
+          var(--accent2) 0 calc(126deg * var(--skill-progress)),
+          var(--amber) calc(126deg * var(--skill-progress)) calc(216deg * var(--skill-progress)),
+          var(--accent) calc(216deg * var(--skill-progress)) calc(295.2deg * var(--skill-progress)),
+          var(--violet) calc(295.2deg * var(--skill-progress)) calc(360deg * var(--skill-progress)),
           rgba(255, 255, 255, 0.06) 0 360deg
         );
         box-shadow: 0 28px 70px rgba(0, 0, 0, 0.36);
@@ -699,6 +702,7 @@
         .value-grid,
         .proof-grid,
         .works-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .proof-grid.three-up { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .approach-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .title-main { font-size: 64px; }
         .title-sub { font-size: 22px; }
@@ -723,6 +727,7 @@
         .proof-grid,
         .works-grid,
         .approach-grid { grid-template-columns: 1fr; }
+        .proof-grid.three-up { grid-template-columns: 1fr; }
         .footer-line { right: 22px; left: 22px; }
       }
 
@@ -773,6 +778,9 @@
           grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 4mm;
           margin-top: 7mm;
+        }
+        .proof-grid.three-up {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
         }
         .proof-card {
           min-height: 31mm;
@@ -888,11 +896,11 @@
 
       <section id="wordpress" class="slide" aria-labelledby="wordpress-title">
         <div class="slide-head"><span class="num">02</span><span>WordPress & Support</span></div>
-        <h2 id="wordpress-title">WordPressと保守対応を、<span class="accent">早期に任せられる</span></h2>
+        <h2 id="wordpress-title">WordPress <span class="accent">運用経験あり</span></h2>
         <p class="lead">
-          新しい人材に発生しがちな教育コストを抑え、サイト運用、顧客対応、一次切り分けまで現場目線で動けます。
+          WordPressの運用経験を土台に、サイト更新、顧客対応、一次切り分けまで現場目線で動けます。
         </p>
-        <div class="proof-grid">
+        <div class="proof-grid three-up">
           <article class="proof-card">
             <h3>WordPress使用経験</h3>
             <strong>Cocoon導入・プラグイン設定</strong>
@@ -906,16 +914,10 @@
             <div class="work-meta"><span class="tag">MCP</span><span class="tag">自動投稿</span></div>
           </article>
           <article class="proof-card">
-            <h3>保守・トラブル対応</h3>
-            <strong>百貨店・現職での顧客対応</strong>
-            <p>システム不具合や問い合わせに対し、状況確認、初動対応、関係者への連携を実施。</p>
-            <div class="work-meta"><span class="tag">保守</span><span class="tag">一次対応</span></div>
-          </article>
-          <article class="proof-card">
-            <h3>現場で動けるフットワーク</h3>
-            <strong>接客・機械メンテ経験</strong>
-            <p>イオンファンタジー時代も、機械メンテや接客対応で現場を走り回った経験あり。</p>
-            <div class="work-meta"><span class="tag">現場対応</span><span class="tag">保守感覚</span></div>
+            <h3>保守トラブル対応とフットワーク</h3>
+            <strong>システム不具合・機械メンテにも柔軟に対応</strong>
+            <p>不具合や問い合わせの初動対応に加え、機械メンテや現場対応も経験。状況を見て動き、必要に応じて関係者へ連携できます。</p>
+            <div class="work-meta"><span class="tag">不具合対応</span><span class="tag">機械メンテ</span></div>
           </article>
         </div>
         <div class="footer-line"><span>LOW RAMP-UP COST</span><span>02 / 06</span></div>
@@ -960,15 +962,15 @@
         <div>
           <div class="slide-head"><span class="num">04</span><span>Skill Mix</span></div>
           <h2 id="skill-title">教育コストを抑え、<span class="accent">早期に立ち上がれる理由</span></h2>
-          <p class="lead">営業・保守の現場感覚と、WordPress、データ分析、生成AIを横断できるハイブリッドな即戦力です。</p>
+          <p class="lead">ディレクション・販促制作を軸に、現場対応、WordPress運用、生成AI活用まで横断できるハイブリッドな即戦力です。</p>
         </div>
         <div class="skill-layout">
           <div class="pie-wrap"><div class="pie" aria-label="スキル割合の円グラフ"></div></div>
           <div class="legend">
-            <div class="legend-row"><span class="swatch" style="background: var(--accent)"></span><div><h3>WordPress・保守対応 (30%)</h3><p>Cocoon / プラグイン / ブログ運営 / 顧客問い合わせ / 一次切り分け</p></div></div>
-            <div class="legend-row"><span class="swatch" style="background: var(--accent2)"></span><div><h3>ディレクション・販促制作 (30%)</h3><p>POP / Webページ / 店頭装飾 / 部門調整 / 制作依頼</p></div></div>
-            <div class="legend-row"><span class="swatch" style="background: var(--violet)"></span><div><h3>生成AI・自走開発 (25%)</h3><p>Codex / Claude Code / Web制作 / プロトタイプ / 画像編集 / MCP連携</p></div></div>
-            <div class="legend-row"><span class="swatch" style="background: var(--amber)"></span><div><h3>現場対応・顧客折衝 (15%)</h3><p>接客 / 保守初動 / トラブル対応 / ヒアリング / 改善提案</p></div></div>
+            <div class="legend-row"><span class="swatch" style="background: var(--accent2)"></span><div><h3>ディレクション・販促制作 (35%)</h3><p>POP / Webページ / 店頭装飾 / 部門調整 / 制作依頼</p></div></div>
+            <div class="legend-row"><span class="swatch" style="background: var(--amber)"></span><div><h3>現場対応・保守トラブル (25%)</h3><p>接客 / 保守初動 / システム不具合 / 機械メンテ / 関係者連携</p></div></div>
+            <div class="legend-row"><span class="swatch" style="background: var(--accent)"></span><div><h3>WordPress運用 (22%)</h3><p>Cocoon / プラグイン / ブログ運営 / 記事投稿 / Web更新</p></div></div>
+            <div class="legend-row"><span class="swatch" style="background: var(--violet)"></span><div><h3>生成AI・自走開発 (18%)</h3><p>Codex / Claude Code / Web制作 / プロトタイプ / 画像編集 / MCP連携</p></div></div>
           </div>
         </div>
         <div class="footer-line"><span>SKILL MIX</span><span>04 / 06</span></div>
